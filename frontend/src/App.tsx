@@ -1,30 +1,65 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import ErrorBoundary from "./components/ErrorBoundary";
 import HomeScreen from "./pages/HomeScreen";
 import FineCalculator from "./pages/FineCalculator";
+import HistoryScreen from "./pages/HistoryScreen";
+import ChallengeScreen from "./pages/ChallengeScreen";
+import AdminScreen from "./pages/AdminScreen";
+import NotFound from "./pages/NotFound";
 
-export default function App() {
-  const [tab, setTab] = useState<"home" | "fine">("home");
+const tabs = [
+  { path: "/", label: "📖 홈" },
+  { path: "/history", label: "📅 이력" },
+  { path: "/challenge", label: "🏆 챌린지" },
+  { path: "/fine", label: "💰 벌금" },
+];
+
+function AppLayout() {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith("/admin");
 
   return (
-    <div>
-      {tab === "home" ? <HomeScreen /> : <FineCalculator />}
-      <nav className="fixed bottom-0 left-0 right-0 flex border-t" style={{ background: "#0f2318", borderColor: "#2d6a4f" }}>
-        <button
-          onClick={() => setTab("home")}
-          className="flex-1 py-3 text-sm font-medium transition"
-          style={{ color: tab === "home" ? "#74c69d" : "#888" }}
-        >
-          📖 홈
-        </button>
-        <button
-          onClick={() => setTab("fine")}
-          className="flex-1 py-3 text-sm font-medium transition"
-          style={{ color: tab === "fine" ? "#74c69d" : "#888" }}
-        >
-          💰 벌금
-        </button>
-      </nav>
-      <div className="h-14" />
-    </div>
+    <>
+      <Routes>
+        <Route path="/" element={<HomeScreen />} />
+        <Route path="/history" element={<HistoryScreen />} />
+        <Route path="/challenge" element={<ChallengeScreen />} />
+        <Route path="/fine" element={<FineCalculator />} />
+        <Route path="/admin" element={<AdminScreen />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {!isAdmin && (
+        <>
+          <nav className="fixed bottom-0 left-0 right-0 flex border-t border-accent bg-base-dark">
+            {tabs.map(({ path, label }) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/"}
+                className={({ isActive }) =>
+                  `flex-1 py-3 text-sm font-medium transition text-center ${
+                    isActive ? "text-accent-light" : "text-gray-500"
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="h-14" />
+        </>
+      )}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
