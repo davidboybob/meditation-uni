@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import {
   listChallenges,
   createChallenge,
@@ -22,7 +23,6 @@ export default function ChallengeScreen() {
   const [challenges, setChallenges] = useState<ChallengeResponse[]>([]);
   const [selected, setSelected] = useState<ChallengeTodayResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // 생성 폼
   const [showCreate, setShowCreate] = useState(false);
@@ -37,7 +37,7 @@ export default function ChallengeScreen() {
       const list = await listChallenges();
       setChallenges(list);
     } catch {
-      setError("챌린지 목록을 불러오지 못했습니다.");
+      toast.error("챌린지 목록을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,6 @@ export default function ChallengeScreen() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     try {
       const created = await createChallenge({
         name, start_date: startDate, end_date: endDate, deadline_time: deadlineTime,
@@ -58,21 +57,23 @@ export default function ChallengeScreen() {
       setName("");
       setEndDate("");
       loadChallenges();
+      toast.success("챌린지가 생성되었습니다.");
     } catch {
-      setError("챌린지 생성에 실패했습니다.");
+      toast.error("챌린지 생성에 실패했습니다.");
     }
   };
 
   const handleJoin = async (id: number) => {
-    if (!userEmail) { setError("홈에서 이름/이메일을 먼저 설정하세요."); return; }
+    if (!userEmail) { toast.error("홈에서 이름/이메일을 먼저 설정하세요."); return; }
     try {
       await joinChallenge(id, userEmail);
       loadChallenges();
+      toast.success("챌린지에 참여했습니다.");
     } catch (err: unknown) {
       if (err instanceof Error && err.message === "already_joined") {
-        setError("이미 참여 중입니다.");
+        toast.warning("이미 참여 중입니다.");
       } else {
-        setError("참여 실패.");
+        toast.error("참여에 실패했습니다.");
       }
     }
   };
@@ -83,19 +84,19 @@ export default function ChallengeScreen() {
       await leaveChallenge(id, userEmail);
       if (selected?.challenge.id === id) setSelected(null);
       loadChallenges();
+      toast.success("챌린지에서 나갔습니다.");
     } catch {
-      setError("탈퇴 실패.");
+      toast.error("탈퇴에 실패했습니다.");
     }
   };
 
   const handleViewToday = async (id: number) => {
     setLoading(true);
-    setError("");
     try {
       const data = await getChallengeToday(id);
       setSelected(data);
     } catch {
-      setError("출석 현황을 불러오지 못했습니다.");
+      toast.error("출석 현황을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -115,8 +116,6 @@ export default function ChallengeScreen() {
         <h2 className="text-2xl font-bold mb-6 text-center font-serif">
           🏆 챌린지
         </h2>
-
-        {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
 
         {/* 출석 현황 (선택된 챌린지) */}
         {selected && (

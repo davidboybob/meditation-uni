@@ -1,8 +1,9 @@
 from __future__ import annotations
+import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = "sqlite+aiosqlite:///./meditation.db"
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite+aiosqlite:///./meditation.db")
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)

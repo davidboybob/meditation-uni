@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+tests/
+.env
+.env.local
+meditation.db
+*.db
+.DS_Store

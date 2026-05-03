@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { submitPost, getTodayStatus, type TodayStatus } from "../api/client";
 
 const USER_EMAIL_KEY = "meditation_user_email";
@@ -20,7 +21,6 @@ export default function HomeScreen() {
   const [deadline, setDeadline] = useState("06:00");
   const [todayStatus, setTodayStatus] = useState<TodayStatus | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // 오늘 제출 상태 조회
   useEffect(() => {
@@ -40,9 +40,8 @@ export default function HomeScreen() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userEmail) { setError("이름/이메일을 먼저 설정하세요."); return; }
+    if (!userEmail) { toast.error("이름/이메일을 먼저 설정하세요."); return; }
     setLoading(true);
-    setError("");
     try {
       const now = new Date();
       const submissionTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
@@ -56,13 +55,13 @@ export default function HomeScreen() {
       const status = await getTodayStatus(userEmail);
       setTodayStatus(status);
       setContent("");
+      toast.success(status.status === "present" ? "출석 완료!" : "지각 제출되었습니다.");
     } catch (err: unknown) {
       if (err instanceof Error && err.message === "duplicate") {
-        setError("오늘은 이미 묵상을 제출했습니다.");
-        // 서버에서 기존 상태 가져오기
+        toast.warning("오늘은 이미 묵상을 제출했습니다.");
         getTodayStatus(userEmail).then(setTodayStatus).catch(() => {});
       } else {
-        setError("제출에 실패했습니다. 서버 상태를 확인하세요.");
+        toast.error("제출에 실패했습니다. 서버 상태를 확인하세요.");
       }
     } finally {
       setLoading(false);
@@ -153,8 +152,6 @@ export default function HomeScreen() {
                 className="w-full p-3 rounded text-black resize-none"
               />
             </div>
-
-            {error && <p className="text-red-400 text-sm">{error}</p>}
 
             <button
               type="submit"

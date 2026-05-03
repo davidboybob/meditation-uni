@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import {
   verifyPin,
   listChallenges,
@@ -85,7 +86,6 @@ function AdminPanel() {
   const [challenges, setChallenges] = useState<ChallengeResponse[]>([]);
   const [selected, setSelected] = useState<ChallengeAttendance | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   // 편집 상태
   const [editing, setEditing] = useState<ChallengeResponse | null>(null);
@@ -99,7 +99,7 @@ function AdminPanel() {
     try {
       setChallenges(await listChallenges());
     } catch {
-      setError("챌린지 목록 로드 실패");
+      toast.error("챌린지 목록을 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -109,11 +109,10 @@ function AdminPanel() {
 
   const handleSelect = async (id: number) => {
     setLoading(true);
-    setError("");
     try {
       setSelected(await getChallengeAttendance(id));
     } catch {
-      setError("출석 데이터 로드 실패");
+      toast.error("출석 데이터를 불러오지 못했습니다.");
     } finally {
       setLoading(false);
     }
@@ -125,8 +124,9 @@ function AdminPanel() {
       await deleteChallenge(id);
       if (selected?.challenge.id === id) setSelected(null);
       loadChallenges();
+      toast.success("챌린지가 삭제되었습니다.");
     } catch {
-      setError("삭제 실패");
+      toast.error("챌린지 삭제에 실패했습니다.");
     }
   };
 
@@ -143,8 +143,9 @@ function AdminPanel() {
       setEditing(null);
       loadChallenges();
       if (selected?.challenge.id === editing.id) handleSelect(editing.id);
+      toast.success("챌린지가 수정되었습니다.");
     } catch {
-      setError("수정 실패");
+      toast.error("챌린지 수정에 실패했습니다.");
     }
   };
 
@@ -154,8 +155,9 @@ function AdminPanel() {
       await removeMember(challengeId, email);
       handleSelect(challengeId);
       loadChallenges();
+      toast.success(`${email}을(를) 제거했습니다.`);
     } catch {
-      setError("멤버 제거 실패");
+      toast.error("멤버 제거에 실패했습니다.");
     }
   };
 
@@ -167,8 +169,9 @@ function AdminPanel() {
       setAddEmail("");
       handleSelect(challengeId);
       loadChallenges();
+      toast.success(`${email}을(를) 추가했습니다.`);
     } catch {
-      setError("멤버 추가 실패 (이미 참여 중일 수 있습니다)");
+      toast.error("멤버 추가에 실패했습니다. 이미 참여 중일 수 있습니다.");
     }
   };
 
@@ -186,13 +189,6 @@ function AdminPanel() {
           <h1 className="text-2xl font-bold font-serif">🛠 관리자</h1>
           <button onClick={handleLogout} className="text-xs text-red-400 underline">로그아웃</button>
         </div>
-
-        {error && (
-          <div className="mb-4 p-3 rounded-lg text-sm text-red-400 bg-card">
-            {error}
-            <button onClick={() => setError("")} className="ml-2 underline text-xs">닫기</button>
-          </div>
-        )}
 
         {/* 챌린지 목록 */}
         {!selected && !editing && (

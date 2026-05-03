@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { Toaster } from "sonner";
 import ErrorBoundary from "./components/ErrorBoundary";
 import HomeScreen from "./pages/HomeScreen";
 import FineCalculator from "./pages/FineCalculator";
@@ -60,6 +61,7 @@ export default function App() {
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
+      <Toaster position="top-center" richColors theme="dark" />
     </ErrorBoundary>
   );
 }

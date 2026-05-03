@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { calculateFine, getAttendanceSummary, type FineResponse } from "../api/client";
 
 const USER_EMAIL_KEY = "meditation_user_email";
@@ -8,17 +9,15 @@ export default function FineCalculator() {
   const [absentCount, setAbsentCount] = useState(0);
   const [result, setResult] = useState<FineResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [autoLoaded, setAutoLoaded] = useState(false);
 
   const runCalculation = useCallback(async (late: number, absent: number) => {
     setLoading(true);
-    setError("");
     try {
       const res = await calculateFine({ late_count: late, absent_count: absent });
       setResult(res);
     } catch {
-      setError("계산 실패. 서버 상태를 확인하세요.");
+      toast.error("계산 실패. 서버 상태를 확인하세요.");
     } finally {
       setLoading(false);
     }
@@ -81,8 +80,6 @@ export default function FineCalculator() {
               className="w-full p-2 rounded text-black"
             />
           </div>
-
-          {error && <p className="text-red-400 text-sm">{error}</p>}
 
           <button
             type="submit"

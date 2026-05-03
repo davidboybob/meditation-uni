@@ -1,9 +1,22 @@
 from __future__ import annotations
 import re
-from pydantic import BaseModel, ConfigDict, field_validator
+from datetime import date as _date
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from typing import Optional
 
 _TIME_RE = re.compile(r"^\d{2}:\d{2}$")
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _validate_date(value: str, field_name: str) -> str:
+    """YYYY-MM-DD 형식이고 유효한 날짜인지 검증한다."""
+    if not _DATE_RE.match(value):
+        raise ValueError(f"{field_name}은 YYYY-MM-DD 형식이어야 합니다.")
+    try:
+        _date.fromisoformat(value)
+    except ValueError:
+        raise ValueError(f"{field_name}이 유효한 날짜가 아닙니다: {value}")
+    return value
 
 
 def _validate_time(value: str, field_name: str) -> str:
@@ -95,10 +108,26 @@ class ChallengeCreate(BaseModel):
             raise ValueError("챌린지 이름은 빈 문자열일 수 없습니다.")
         return v
 
+    @field_validator("start_date")
+    @classmethod
+    def start_date_format(cls, v: str) -> str:
+        return _validate_date(v, "start_date")
+
+    @field_validator("end_date")
+    @classmethod
+    def end_date_format(cls, v: str) -> str:
+        return _validate_date(v, "end_date")
+
     @field_validator("deadline_time")
     @classmethod
     def deadline_format(cls, v: str) -> str:
         return _validate_time(v, "deadline_time")
+
+    @model_validator(mode="after")
+    def start_before_end(self) -> "ChallengeCreate":
+        if self.start_date > self.end_date:
+            raise ValueError("시작일이 종료일보다 늦을 수 없습니다.")
+        return self
 
 
 class ChallengeResponse(BaseModel):
@@ -131,12 +160,33 @@ class ChallengeUpdate(BaseModel):
     end_date: Optional[str] = None
     deadline_time: Optional[str] = None
 
+    @field_validator("start_date")
+    @classmethod
+    def start_date_format(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            return _validate_date(v, "start_date")
+        return v
+
+    @field_validator("end_date")
+    @classmethod
+    def end_date_format(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            return _validate_date(v, "end_date")
+        return v
+
     @field_validator("deadline_time")
     @classmethod
     def deadline_format(cls, v: Optional[str]) -> Optional[str]:
         if v is not None:
             return _validate_time(v, "deadline_time")
         return v
+
+    @model_validator(mode="after")
+    def start_before_end(self) -> "ChallengeUpdate":
+        if self.start_date is not None and self.end_date is not None:
+            if self.start_date > self.end_date:
+                raise ValueError("시작일이 종료일보다 늦을 수 없습니다.")
+        return self
 
 
 class MemberStats(BaseModel):
