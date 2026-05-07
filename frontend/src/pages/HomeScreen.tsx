@@ -72,25 +72,25 @@ export default function HomeScreen() {
 
   const statusBadge = todayStatus?.submitted
     ? todayStatus.status === "present"
-      ? { label: "출석 ✅", cls: "bg-green-700 text-white" }
-      : { label: "지각 ⚠️", cls: "bg-yellow-600 text-white" }
-    : { label: "미제출 ❌", cls: "bg-gray-600 text-white" };
+      ? { label: "출석 ✅", cls: "bg-status-presentBg text-status-presentTx" }
+      : { label: "지각 ⚠️", cls: "bg-status-lateBg text-status-lateTx" }
+    : { label: "미제출", cls: "bg-gray-100 text-gray-500" };
 
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-xl mx-auto">
         {/* 헤더 */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold mb-1 font-serif drop-shadow-md">
+          <h1 className="text-4xl font-bold mb-1 font-display tracking-tight text-accent-deep">
             📖 묵상대학
           </h1>
-          <p className="text-sm opacity-70">{today}</p>
+          <p className="text-sm text-gray-500">{today}</p>
         </div>
 
         {/* 사용자 이메일 설정 */}
         {showEmailEdit ? (
-          <div className="mb-5 p-4 rounded-lg bg-card">
-            <p className="text-sm mb-2 opacity-80">이름 또는 이메일을 입력하세요</p>
+          <div className="mb-5 p-4 rounded-2xl bg-card">
+            <p className="text-sm mb-2 text-gray-600">이름 또는 이메일을 입력하세요</p>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -98,33 +98,33 @@ export default function HomeScreen() {
                 onChange={(e) => setEmailInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && saveEmail()}
                 placeholder="예: hong@example.com"
-                className="flex-1 p-2 rounded text-black text-sm"
+                className="flex-1 p-2 rounded-xl text-sm"
               />
               <button
                 onClick={saveEmail}
-                className="px-3 py-2 rounded text-sm font-medium text-white bg-accent"
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-accent shadow-button hover:bg-accent-deep transition"
               >
                 저장
               </button>
             </div>
           </div>
         ) : (
-          <div className="mb-5 flex justify-between items-center text-sm opacity-70">
-            <span>👤 {userEmail}</span>
-            <button onClick={() => setShowEmailEdit(true)} className="underline text-xs">변경</button>
+          <div className="mb-5 flex justify-between items-center text-sm">
+            <span className="text-gray-600">👤 {userEmail}</span>
+            <button onClick={() => setShowEmailEdit(true)} className="underline text-xs text-accent-deep">변경</button>
           </div>
         )}
 
         {/* 출석 상태 */}
-        <div className="flex justify-between items-center mb-6 p-4 rounded-lg bg-card">
-          <span className="text-sm">오늘의 출석 상태</span>
-          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusBadge.cls}`}>
+        <div className="flex justify-between items-center mb-6 p-4 rounded-2xl bg-card">
+          <span className="text-sm text-gray-600">오늘의 출석 상태</span>
+          <span className={`px-3 py-1.5 rounded-full text-sm font-semibold ${statusBadge.cls}`}>
             {statusBadge.label}
           </span>
         </div>
 
         {todayStatus?.submitted && todayStatus.message && (
-          <div className="mb-4 p-3 rounded-lg text-center text-sm bg-card-hover">
+          <div className="mb-4 p-3 rounded-2xl text-center text-sm bg-accent-soft text-accent-deep">
             {todayStatus.message}
           </div>
         )}
@@ -133,40 +133,42 @@ export default function HomeScreen() {
         {!alreadySubmitted && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm mb-1 opacity-80">마감 시간</label>
+              <label className="block text-sm mb-1 text-gray-600">마감 시간</label>
               <input
                 type="time"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="w-full p-2 rounded text-black"
+                className="w-full p-2 rounded-xl"
               />
             </div>
             <div>
-              <label className="block text-sm mb-1 opacity-80">오늘의 묵상</label>
+              <label className="block text-sm mb-1 text-gray-600">오늘의 묵상</label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={6}
                 placeholder="오늘 묵상한 내용을 기록하세요..."
                 required
-                className="w-full p-3 rounded text-black resize-none"
+                className="w-full p-3 rounded-2xl resize-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || !userEmail}
-              className={`w-full py-3 rounded-lg font-bold text-white transition ${
-                loading || !userEmail ? "bg-gray-600" : "bg-accent hover:bg-accent/80"
+              className={`w-full py-3 rounded-2xl font-bold text-white transition ${
+                loading || !userEmail
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-accent hover:bg-accent-deep shadow-button"
               }`}
             >
-              {loading ? "제출 중..." : "묵상 제출하기"}
+              {loading ? "제출 중..." : "묵상 제출하기 ✨"}
             </button>
           </form>
         )}
 
         {alreadySubmitted && (
-          <div className="text-center text-sm opacity-60 mt-4">
+          <div className="text-center text-sm text-gray-500 mt-4">
             오늘 묵상을 완료했습니다. 내일 또 만나요! 🌿
           </div>
         )}

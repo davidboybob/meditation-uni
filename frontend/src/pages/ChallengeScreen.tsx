@@ -13,8 +13,8 @@ import {
 const USER_EMAIL_KEY = "meditation_user_email";
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-  present: { label: "출석", cls: "bg-green-700 text-white" },
-  late: { label: "지각", cls: "bg-yellow-600 text-white" },
+  present: { label: "출석", cls: "bg-status-presentBg text-status-presentTx" },
+  late: { label: "지각", cls: "bg-status-lateBg text-status-lateTx" },
 };
 
 export default function ChallengeScreen() {
@@ -105,7 +105,7 @@ export default function ChallengeScreen() {
   if (!userEmail) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <p className="text-sm opacity-70">홈 화면에서 이름/이메일을 먼저 설정하세요.</p>
+        <p className="text-sm text-gray-500">홈 화면에서 이름/이메일을 먼저 설정하세요.</p>
       </div>
     );
   }
@@ -113,7 +113,7 @@ export default function ChallengeScreen() {
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center font-serif">
+        <h2 className="text-2xl font-bold mb-6 text-center font-display tracking-tight text-accent-deep">
           🏆 챌린지
         </h2>
 
@@ -122,24 +122,24 @@ export default function ChallengeScreen() {
           <div className="mb-6">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-lg">{selected.challenge.name}</h3>
-              <button onClick={() => setSelected(null)} className="text-xs underline opacity-60">닫기</button>
+              <button onClick={() => setSelected(null)} className="text-xs underline text-gray-500">닫기</button>
             </div>
-            <p className="text-xs opacity-60 mb-3">{selected.date} 출석 현황</p>
+            <p className="text-xs text-gray-500 mb-3">{selected.date} 출석 현황</p>
 
             <div className="space-y-2">
               {selected.members.map((m) => {
                 const badge = m.submitted
-                  ? STATUS_BADGE[m.status || ""] || { label: m.status, cls: "bg-gray-600 text-white" }
-                  : { label: "미제출", cls: "bg-gray-600 text-white" };
+                  ? STATUS_BADGE[m.status || ""] || { label: m.status, cls: "bg-gray-100 text-gray-500" }
+                  : { label: "미제출", cls: "bg-gray-100 text-gray-500" };
                 return (
                   <div
                     key={m.user_email}
-                    className="flex justify-between items-center p-3 rounded-lg bg-card"
+                    className="flex justify-between items-center p-3 rounded-2xl bg-card"
                   >
                     <div>
                       <div className="text-sm font-medium">{m.user_email}</div>
                       {m.submission_time && (
-                        <div className="text-xs opacity-50 mt-0.5">{m.submission_time} 제출</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{m.submission_time} 제출</div>
                       )}
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badge.cls}`}>
@@ -149,7 +149,7 @@ export default function ChallengeScreen() {
                 );
               })}
               {selected.members.length === 0 && (
-                <p className="text-center text-sm opacity-60">아직 참가자가 없습니다.</p>
+                <p className="text-center text-sm text-gray-500">아직 참가자가 없습니다.</p>
               )}
             </div>
           </div>
@@ -158,38 +158,38 @@ export default function ChallengeScreen() {
         {/* 챌린지 목록 */}
         {!selected && (
           <>
-            {loading && <p className="text-center text-sm opacity-60">불러오는 중...</p>}
+            {loading && <p className="text-center text-sm text-gray-500">불러오는 중...</p>}
 
             <div className="space-y-3 mb-6">
               {challenges.map((c) => (
-                <div key={c.id} className="p-4 rounded-lg bg-card">
+                <div key={c.id} className="p-4 rounded-2xl bg-card">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <div className="font-bold">{c.name}</div>
-                      <div className="text-xs opacity-50 mt-1">
+                      <div className="text-xs text-gray-500 mt-1">
                         {c.start_date} ~ {c.end_date} · 마감 {c.deadline_time}
                       </div>
                     </div>
-                    <span className="text-xs px-2 py-1 rounded-full bg-accent-light/20 text-accent-light">
+                    <span className="text-xs px-2.5 py-1 rounded-full bg-accent-soft text-accent-deep font-medium">
                       {c.member_count}명
                     </span>
                   </div>
                   <div className="flex gap-2 mt-3">
                     <button
                       onClick={() => handleViewToday(c.id)}
-                      className="flex-1 py-2 rounded text-sm font-medium text-white bg-accent"
+                      className="flex-1 py-2 rounded-xl text-sm font-semibold text-white bg-accent hover:bg-accent-deep transition"
                     >
                       출석 현황
                     </button>
                     <button
                       onClick={() => handleJoin(c.id)}
-                      className="px-3 py-2 rounded text-sm font-medium bg-card-hover"
+                      className="px-3 py-2 rounded-xl text-sm font-medium bg-accent-soft text-accent-deep hover:bg-accent/20 transition"
                     >
                       참여
                     </button>
                     <button
                       onClick={() => handleLeave(c.id)}
-                      className="px-3 py-2 rounded text-sm font-medium text-red-400 bg-card-subtle"
+                      className="px-3 py-2 rounded-xl text-sm font-medium text-rose-500 bg-rose-50 hover:bg-rose-100 transition"
                     >
                       나가기
                     </button>
@@ -197,13 +197,13 @@ export default function ChallengeScreen() {
                 </div>
               ))}
               {!loading && challenges.length === 0 && !showCreate && (
-                <p className="text-center text-sm opacity-60 mt-8">아직 챌린지가 없습니다.</p>
+                <p className="text-center text-sm text-gray-500 mt-8">아직 챌린지가 없습니다.</p>
               )}
             </div>
 
             {/* 생성 폼 */}
             {showCreate ? (
-              <form onSubmit={handleCreate} className="space-y-3 p-4 rounded-lg bg-card">
+              <form onSubmit={handleCreate} className="space-y-3 p-4 rounded-2xl bg-card">
                 <h3 className="font-bold text-sm mb-2">새 챌린지 만들기</h3>
                 <input
                   type="text"
@@ -211,27 +211,27 @@ export default function ChallengeScreen() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="챌린지 이름"
                   required
-                  className="w-full p-2 rounded text-black text-sm"
+                  className="w-full p-2 rounded-xl text-sm"
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs opacity-60 mb-1">시작일</label>
-                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full p-2 rounded text-black text-sm" />
+                    <label className="block text-xs text-gray-500 mb-1">시작일</label>
+                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required className="w-full p-2 rounded-xl text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs opacity-60 mb-1">종료일</label>
-                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required className="w-full p-2 rounded text-black text-sm" />
+                    <label className="block text-xs text-gray-500 mb-1">종료일</label>
+                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required className="w-full p-2 rounded-xl text-sm" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs opacity-60 mb-1">마감 시간</label>
-                  <input type="time" value={deadlineTime} onChange={(e) => setDeadlineTime(e.target.value)} required className="w-full p-2 rounded text-black text-sm" />
+                  <label className="block text-xs text-gray-500 mb-1">마감 시간</label>
+                  <input type="time" value={deadlineTime} onChange={(e) => setDeadlineTime(e.target.value)} required className="w-full p-2 rounded-xl text-sm" />
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="flex-1 py-2 rounded text-sm font-bold text-white bg-accent">
+                  <button type="submit" className="flex-1 py-2 rounded-xl text-sm font-bold text-white bg-accent hover:bg-accent-deep shadow-button transition">
                     만들기
                   </button>
-                  <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 rounded text-sm opacity-60">
+                  <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl text-sm text-gray-500">
                     취소
                   </button>
                 </div>
@@ -239,7 +239,7 @@ export default function ChallengeScreen() {
             ) : (
               <button
                 onClick={() => setShowCreate(true)}
-                className="w-full py-3 rounded-lg font-bold text-white bg-accent"
+                className="w-full py-3 rounded-2xl font-bold text-white bg-accent hover:bg-accent-deep shadow-button transition"
               >
                 + 새 챌린지 만들기
               </button>

@@ -4,8 +4,8 @@ import { getPosts, getAttendanceSummary, type PostRecord, type AttendanceSummary
 const USER_EMAIL_KEY = "meditation_user_email";
 
 const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
-  present: { label: "출석 ✅", cls: "bg-green-700 text-white" },
-  late: { label: "지각 ⚠️", cls: "bg-yellow-600 text-white" },
+  present: { label: "출석 ✅", cls: "bg-status-presentBg text-status-presentTx" },
+  late: { label: "지각 ⚠️", cls: "bg-status-lateBg text-status-lateTx" },
 };
 
 export default function HistoryScreen() {
@@ -28,7 +28,7 @@ export default function HistoryScreen() {
   if (!userEmail) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <p className="text-sm opacity-70">홈 화면에서 이름/이메일을 먼저 설정하세요.</p>
+        <p className="text-sm text-gray-500">홈 화면에서 이름/이메일을 먼저 설정하세요.</p>
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function HistoryScreen() {
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center font-serif">
+        <h2 className="text-2xl font-bold mb-6 text-center font-display tracking-tight text-accent-deep">
           📅 출석 이력
         </h2>
 
@@ -48,39 +48,39 @@ export default function HistoryScreen() {
               { label: "지각", value: summary.late_count },
               { label: "제출일수", value: summary.total_days },
             ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg p-3 text-center bg-card">
-                <div className="text-2xl font-bold text-accent-light">{value}</div>
-                <div className="text-xs opacity-70 mt-1">{label}</div>
+              <div key={label} className="rounded-2xl p-3 text-center bg-card">
+                <div className="text-2xl font-bold text-accent-deep">{value}</div>
+                <div className="text-xs text-gray-500 mt-1">{label}</div>
               </div>
             ))}
           </div>
         )}
 
-        {loading && <p className="text-center text-sm opacity-60">불러오는 중...</p>}
-        {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+        {loading && <p className="text-center text-sm text-gray-500">불러오는 중...</p>}
+        {error && <p className="text-rose-500 text-sm text-center">{error}</p>}
 
         {/* 이력 목록 */}
         <div className="space-y-2">
           {posts.map((post) => {
-            const badge = STATUS_LABEL[post.status] || { label: post.status, cls: "bg-gray-600 text-white" };
+            const badge = STATUS_LABEL[post.status] || { label: post.status, cls: "bg-gray-100 text-gray-500" };
             const isOpen = expanded === post.id;
             return (
               <div
                 key={post.id}
-                className="rounded-lg overflow-hidden cursor-pointer bg-card"
+                className="rounded-2xl overflow-hidden cursor-pointer bg-card transition hover:bg-card-hover"
                 onClick={() => setExpanded(isOpen ? null : post.id)}
               >
                 <div className="flex justify-between items-center p-4">
                   <div>
                     <div className="font-medium text-sm">{post.submitted_date}</div>
-                    <div className="text-xs opacity-60 mt-0.5">{post.submission_time} 제출</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{post.submission_time} 제출</div>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badge.cls}`}>
                     {badge.label}
                   </span>
                 </div>
                 {isOpen && (
-                  <div className="px-4 pb-4 text-sm opacity-80 border-t border-card-border">
+                  <div className="px-4 pb-4 text-sm text-gray-700 border-t border-card-border">
                     <p className="mt-3 whitespace-pre-wrap leading-relaxed">{post.content}</p>
                   </div>
                 )}
@@ -88,7 +88,7 @@ export default function HistoryScreen() {
             );
           })}
           {!loading && posts.length === 0 && (
-            <p className="text-center text-sm opacity-60 mt-8">아직 제출 이력이 없습니다.</p>
+            <p className="text-center text-sm text-gray-500 mt-8">아직 제출 이력이 없습니다.</p>
           )}
         </div>
       </div>

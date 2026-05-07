@@ -48,44 +48,44 @@ export default function FineCalculator() {
     <div className="min-h-screen p-6">
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold font-serif">💰 벌금 계산기</h1>
-          <p className="text-sm opacity-60 mt-1">지각 0.5회 = 결석 0.5회 환산</p>
+          <h1 className="text-3xl font-bold font-display tracking-tight text-accent-deep">💰 벌금 계산기</h1>
+          <p className="text-sm text-gray-500 mt-1">지각 0.5회 = 결석 0.5회 환산</p>
         </div>
 
         {autoLoaded && (
-          <div className="mb-4 p-3 rounded-lg text-center text-sm bg-accent-light/15 text-accent-light">
+          <div className="mb-4 p-3 rounded-2xl text-center text-sm bg-accent-soft text-accent-deep">
             출석 이력에서 자동으로 불러왔습니다. 수동 수정도 가능합니다.
           </div>
         )}
 
         <form onSubmit={handleCalculate} className="space-y-4">
-          <div className="p-4 rounded-lg bg-card">
-            <label className="block text-sm mb-2 opacity-80">지각 횟수</label>
+          <div className="p-4 rounded-2xl bg-card">
+            <label className="block text-sm mb-2 text-gray-600">지각 횟수</label>
             <input
               type="number"
               min={0}
               value={lateCount}
               onChange={(e) => setLateCount(Number(e.target.value))}
-              className="w-full p-2 rounded text-black"
+              className="w-full p-2 rounded-xl"
             />
           </div>
 
-          <div className="p-4 rounded-lg bg-card">
-            <label className="block text-sm mb-2 opacity-80">결석 횟수</label>
+          <div className="p-4 rounded-2xl bg-card">
+            <label className="block text-sm mb-2 text-gray-600">결석 횟수</label>
             <input
               type="number"
               min={0}
               value={absentCount}
               onChange={(e) => setAbsentCount(Number(e.target.value))}
-              className="w-full p-2 rounded text-black"
+              className="w-full p-2 rounded-xl"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg font-bold text-white transition ${
-              loading ? "bg-gray-600" : "bg-accent hover:bg-accent/80"
+            className={`w-full py-3 rounded-2xl font-bold text-white transition ${
+              loading ? "bg-gray-300 cursor-not-allowed" : "bg-accent hover:bg-accent-deep shadow-button"
             }`}
           >
             {loading ? "계산 중..." : "벌금 계산하기"}
@@ -93,16 +93,16 @@ export default function FineCalculator() {
         </form>
 
         {result && (
-          <div className="mt-6 p-6 rounded-lg text-center bg-card-hover">
-            <p className="text-4xl font-bold mb-2">{result.total_fine.toLocaleString()}원</p>
-            <p className="text-sm opacity-70">{result.detail}</p>
+          <div className="mt-6 p-6 rounded-2xl text-center bg-gradient-to-br from-accent-soft to-white border border-card-border">
+            <p className="text-4xl font-bold mb-2 text-accent-deep">{result.total_fine.toLocaleString()}원</p>
+            <p className="text-sm text-gray-600">{result.detail}</p>
           </div>
         )}
 
         {/* 벌금 기준표 */}
-        <div className="mt-6 p-4 rounded-lg text-sm bg-card-subtle">
-          <p className="font-semibold mb-2 opacity-80">📋 벌금 기준</p>
-          <ul className="space-y-1 opacity-60">
+        <div className="mt-6 p-4 rounded-2xl text-sm bg-card-subtle">
+          <p className="font-semibold mb-2 text-gray-700">📋 벌금 기준</p>
+          <ul className="space-y-1 text-gray-500">
             <li>• 지각 1회 = 결석 0.5회 환산</li>
             <li>• 환산 결석 4회 미만: 회당 3,000원</li>
             <li>• 환산 결석 4회 이상: 30,000원 (상한)</li>

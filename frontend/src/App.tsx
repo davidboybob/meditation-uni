@@ -32,7 +32,7 @@ function AppLayout() {
 
       {!isAdmin && (
         <>
-          <nav className="fixed bottom-0 left-0 right-0 flex border-t border-accent bg-base-dark">
+          <nav className="fixed bottom-0 left-0 right-0 flex border-t border-card-border bg-white/95 backdrop-blur-sm shadow-card">
             {tabs.map(({ path, label }) => (
               <NavLink
                 key={path}
@@ -40,7 +40,7 @@ function AppLayout() {
                 end={path === "/"}
                 className={({ isActive }) =>
                   `flex-1 py-3 text-sm font-medium transition text-center ${
-                    isActive ? "text-accent-light" : "text-gray-500"
+                    isActive ? "text-accent-deep" : "text-gray-400"
                   }`
                 }
               >
@@ -61,7 +61,7 @@ export default function App() {
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
-      <Toaster position="top-center" richColors theme="dark" />
+      <Toaster position="top-center" richColors theme="light" />
     </ErrorBoundary>
   );
 }
