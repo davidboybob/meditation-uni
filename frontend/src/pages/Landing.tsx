@@ -30,8 +30,12 @@ const STAFF = [
 ];
 
 const PARTNERS = [
-  { emoji: "🏤", name: "홍콩 묵상 동아리", desc: "바다 건너에서 함께 말씀을 나누는 묵상 공동체" },
-  { emoji: "✨", name: "에클레시아 동아리", desc: "캠퍼스와 일상에서 말씀으로 모이는 모임" },
+  {
+    emoji: "🏤",
+    name: "홍콩 에클레시아 동아리",
+    desc: "바다 건너 홍콩에서 함께 말씀으로 모이는 묵상 공동체",
+    href: "https://ecclessia.notion.site/p/6342e00e4df4437dbe8915e08d76e773?pvs=24",
+  },
 ];
 
 const REVIEWS = [
@@ -276,15 +280,24 @@ export default function Landing() {
           </div>
 
           <h3 className="mt-16 text-center text-xl font-bold text-[#3D3654]/80">협력 단체</h3>
-          <div className="mx-auto mt-6 flex max-w-3xl flex-col gap-4 sm:flex-row">
+          <div className="mx-auto mt-6 flex max-w-md flex-col gap-4">
             {PARTNERS.map((p) => (
-              <div key={p.name} className="flex flex-1 items-center gap-4 rounded-2xl border border-card-border bg-white px-6 py-5">
+              <a
+                key={p.name}
+                href={p.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="group flex items-center gap-4 rounded-2xl border border-card-border bg-white px-6 py-5 transition hover:border-accent hover:shadow-card"
+              >
                 <span className="text-2xl">{p.emoji}</span>
-                <div>
-                  <div className="font-semibold">{p.name}</div>
+                <div className="flex-1">
+                  <div className="font-semibold group-hover:text-accent-deep">{p.name}</div>
                   <div className="text-xs text-[#3D3654]/50">{p.desc}</div>
                 </div>
-              </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-[#3D3654]/30 transition group-hover:text-accent" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+                </svg>
+              </a>
             ))}
           </div>
         </div>
