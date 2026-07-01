@@ -1,65 +1,17 @@
-import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import ErrorBoundary from "./components/ErrorBoundary";
-import HomeScreen from "./pages/HomeScreen";
-import FineCalculator from "./pages/FineCalculator";
-import HistoryScreen from "./pages/HistoryScreen";
-import ChallengeScreen from "./pages/ChallengeScreen";
-import AdminScreen from "./pages/AdminScreen";
-import NotFound from "./pages/NotFound";
+import Landing from "./pages/Landing";
 
-const tabs = [
-  { path: "/", label: "📖 홈" },
-  { path: "/history", label: "📅 이력" },
-  { path: "/challenge", label: "🏆 챌린지" },
-  { path: "/fine", label: "💰 벌금" },
-];
-
-function AppLayout() {
-  const { pathname } = useLocation();
-  const isAdmin = pathname.startsWith("/admin");
-
-  return (
-    <>
-      <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/history" element={<HistoryScreen />} />
-        <Route path="/challenge" element={<ChallengeScreen />} />
-        <Route path="/fine" element={<FineCalculator />} />
-        <Route path="/admin" element={<AdminScreen />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-
-      {!isAdmin && (
-        <>
-          <nav className="fixed bottom-0 left-0 right-0 flex border-t border-card-border bg-white/95 backdrop-blur-sm shadow-card">
-            {tabs.map(({ path, label }) => (
-              <NavLink
-                key={path}
-                to={path}
-                end={path === "/"}
-                className={({ isActive }) =>
-                  `flex-1 py-3 text-sm font-medium transition text-center ${
-                    isActive ? "text-accent-deep" : "text-gray-400"
-                  }`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-          </nav>
-          <div className="h-14" />
-        </>
-      )}
-    </>
-  );
-}
-
+// 묵상대학 홈페이지(정적). 콘솔 앱은 별도 앱으로 분리 예정 — 여기서는 홈페이지만 서빙한다.
 export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <AppLayout />
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </BrowserRouter>
       <Toaster position="top-center" richColors theme="light" />
     </ErrorBoundary>

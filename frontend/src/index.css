@@ -22,8 +22,10 @@
     @apply bg-base-bg text-base-text font-sans antialiased;
   }
 
+  /* 앱 화면은 AppLayout에서 max-w-xl 래퍼로 폭을 제한하고,
+     랜딩(/)은 풀폭으로 표시한다. */
   #root {
-    @apply max-w-xl mx-auto;
+    @apply w-full;
   }
 
   input[type="text"],
