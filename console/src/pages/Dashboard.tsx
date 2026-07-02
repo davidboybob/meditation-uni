@@ -133,6 +133,38 @@ export default function Dashboard() {
     if (!ok) toast.error("카카오 SDK 로드 실패 — 키 설정을 확인하세요.");
   };
 
+  // 주간 리포트 (최근 7일)
+  const copyWeekly = async () => {
+    const days = spark.map((s) => `${s.day}일 ${Math.round(s.rate * 100)}%`).join(" · ");
+    const perMember = members
+      .map((m) => {
+        const mine = weekRecords.filter((r) => r.user_id === m.user_id);
+        const a = mine.filter((r) => r.status === "absent").length;
+        const l = mine.filter((r) => r.status === "late").length;
+        const ok = mine.filter((r) => r.status === "present" || r.status === "late").length;
+        return { name: m.profiles.display_name, a, l, ok };
+      })
+      .sort((x, y) => x.a + x.l - (y.a + y.l));
+    const lines = [
+      `📈 묵상대학 주간 리포트 (${weekRange()})`,
+      `일별 제출률: ${days}`,
+      "",
+      ...perMember.map((p) =>
+        p.a + p.l === 0 ? `✨ ${p.name}: ${p.ok}일 제출 무결점!` : `· ${p.name}: 제출 ${p.ok}일 (결석 ${p.a}·지각 ${p.l})`,
+      ),
+      "",
+      "이번 주도 함께 완주해요! 🙏",
+    ];
+    await navigator.clipboard.writeText(lines.join("\n"));
+    toast.success("주간 리포트를 복사했어요. 카톡방에 붙여넣기!");
+  };
+
+  const weekRange = () => {
+    const from = new Date();
+    from.setDate(from.getDate() - 6);
+    return `${from.getMonth() + 1}/${from.getDate()}~${new Date().getMonth() + 1}/${new Date().getDate()}`;
+  };
+
   // 미기록 멤버 전원 출석 처리
   const bulkPresent = async () => {
     const targets = members.filter((m) => !recordOf(m.user_id));
@@ -210,12 +242,15 @@ export default function Dashboard() {
             {today} {passage ? `· 오늘 본문: ${passage}` : ""}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {kakaoEnabled && (
             <button type="button" className="btn-ghost" onClick={() => void kakaoReminder()}>
               💬 카카오로 공유
             </button>
           )}
+          <button type="button" className="btn-ghost" onClick={() => void copyWeekly()}>
+            📈 주간 리포트
+          </button>
           <button type="button" className="btn-primary" onClick={() => void copyReminder()}>
             📋 리마인드 문구 복사
           </button>
