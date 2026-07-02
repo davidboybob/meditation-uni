@@ -58,6 +58,7 @@ export default function Feed() {
   const isAdmin = ctx!.role === "owner" || ctx!.role === "admin";
 
   const [items, setItems] = useState<FeedItem[]>([]);
+  const [limit, setLimit] = useState(20);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -69,10 +70,10 @@ export default function Feed() {
       .not("note", "is", null)
       .order("date", { ascending: false })
       .order("created_at", { referencedTable: "comments", ascending: true })
-      .limit(20);
+      .limit(limit);
     if (error) return toast.error(error.message);
     setItems((data as unknown as FeedItem[]) ?? []);
-  }, [group.id]);
+  }, [group.id, limit]);
 
   useEffect(() => {
     void load();
@@ -148,6 +149,11 @@ export default function Feed() {
           <div className="card py-12 text-center text-sm text-base-text/40">
             아직 나눔 글이 없어요. ‘내 묵상’에서 오늘 묵상을 제출하면 여기에 표시됩니다.
           </div>
+        )}
+        {items.length >= limit && (
+          <button type="button" className="btn-ghost self-center" onClick={() => setLimit((n) => n + 20)}>
+            더 보기
+          </button>
         )}
       </div>
     </div>

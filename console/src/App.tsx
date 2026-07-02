@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthProvider } from "./auth/AuthContext";
 import Shell from "./components/Shell";
 import Login from "./pages/Login";
@@ -14,7 +15,8 @@ import Feed from "./pages/Feed";
 
 export default function App() {
   return (
-    <AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -31,7 +33,8 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-center" richColors theme="light" />
-    </AuthProvider>
+        <Toaster position="top-center" richColors theme="light" />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
