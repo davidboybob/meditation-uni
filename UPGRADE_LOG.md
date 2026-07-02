@@ -5,12 +5,13 @@
 
 ## 백로그 (우선순위순)
 
-- [~] I1. 킷 추출: `@kit/challenge` + `@kit/kakao` + CSV/클립보드 유틸 — kit-developer 에이전트 **진행 중(백그라운드)**
+- [x] I1. 킷 추출: `@kit/challenge`(정산·스트릭·통계·rank) + `@kit/kakao` + `@kit/utils`(CSV·클립보드) ✅ 킷 커밋 3423da0, 스모크 24 assert 통과
 - [x] I1. 웹/앱 배포 품질: 홈·콘솔 PWA(manifest·아이콘·theme-color) + SEO/OG 메타 ✅ 배포·검증됨
-- [ ] I2. 콘솔이 킷 모듈 소비하도록 리팩터(@kit/challenge·@kit/kakao 실전 검증, 중복 제거)
+- [x] I2. 콘솔이 킷 소비: kakao/date/streak/rank/CSV 전부 킷으로 교체, file: 의존 → **로컬 프리빌드 배포 전환**(배포 5초) ✅ 라이브 검증
 - [x] I3. 통독 일정 자동 생성기(책·장 범위+시작일, 주일 건너뛰기 옵션) ✅ 프로덕션 검증(사도행전 1~5 생성)
 - [x] I4. 주간 리포트: 최근 7일 제출률·개인별 요약 카톡 복사 버튼(대시보드) ✅
-- [ ] I5. 출석부 정정 이력 뷰(attendance_adjustments 열람 화면)
+- [x] I5. 출석부 정정 이력 뷰 ✅ FK 모호성(profiles 2개 관계) 명시로 해결, 프로덕션 검증
+- [x] I9. e2e 스모크 통합: `console/scripts/smoke.mjs`(비번은 MUKSANG_TEST_PW 환경변수) ✅ 10/10
 - [ ] I6. 콘솔 테마: @kit/tokens console-dark 적용 검토(다크모드 토글)
 - [ ] I7. 홈페이지 활동사진첩(갤러리) 섹션 — 노션 원본 항목
 - [ ] I8. 초대코드 가입 플로우(join_code 입력 검증) — 다중 그룹 대비

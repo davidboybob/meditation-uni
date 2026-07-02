@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { downloadCsv } from "@kit/utils";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
 import { addMonths, fmtWon, thisMonth } from "../lib/date";
@@ -108,25 +109,19 @@ export default function SettlementPage() {
   };
 
   const exportCsv = () => {
-    const head = "이름,결석,지각,환산결석,차감액,환급액,이월,장학";
-    const rows = items.map((i) =>
-      [
-        i.profiles?.display_name ?? "?",
-        i.absences,
-        i.lates,
-        i.effective_absences,
-        i.deduction,
-        i.refund,
-        i.carryover ? "O" : "",
-        i.scholarship ? "O" : "",
-      ].join(","),
-    );
-    const blob = new Blob(["﻿" + [head, ...rows].join("\n")], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `정산_${month}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    const head = ["이름", "결석", "지각", "환산결석", "차감액", "환급액", "이월", "장학", "전월이월적용"];
+    const rows = items.map((i) => [
+      i.profiles?.display_name ?? "?",
+      i.absences,
+      i.lates,
+      i.effective_absences,
+      i.deduction,
+      i.refund,
+      i.carryover ? "O" : "",
+      i.scholarship ? "O" : "",
+      i.carryover_in ? "O" : "",
+    ]);
+    downloadCsv(`정산_${month}.csv`, [head, ...rows]);
   };
 
   const confirmed = stl?.status === "confirmed";

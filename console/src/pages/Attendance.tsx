@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { downloadCsv } from "@kit/utils";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
 import { addMonths, monthDates, thisMonth, todayYmd } from "../lib/date";
@@ -18,6 +19,16 @@ interface CellTarget {
   record: AttendanceRecord | undefined;
 }
 
+interface AdjustmentRow {
+  id: string;
+  old_status: string | null;
+  new_status: string;
+  reason: string;
+  created_at: string;
+  attendance_records: { date: string; profiles: { display_name: string } };
+  profiles: { display_name: string };
+}
+
 const ALL_STATUS: AttendanceStatus[] = ["present", "late", "absent", "excused"];
 
 export default function Attendance() {
@@ -30,6 +41,7 @@ export default function Attendance() {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [target, setTarget] = useState<CellTarget | null>(null);
   const [reason, setReason] = useState("");
+  const [adjustments, setAdjustments] = useState<AdjustmentRow[] | null>(null); // null = 닫힘
 
   const dates = useMemo(() => monthDates(month), [month]);
 
@@ -114,6 +126,19 @@ export default function Attendance() {
     void load();
   };
 
+  const openAdjustments = async () => {
+    const { data, error } = await supabase
+      .from("attendance_adjustments")
+      .select(
+        "id, old_status, new_status, reason, created_at, attendance_records!inner(date, group_id, profiles!attendance_records_user_id_fkey(display_name)), profiles!attendance_adjustments_adjusted_by_fkey(display_name)",
+      )
+      .eq("attendance_records.group_id", group.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) return toast.error(error.message);
+    setAdjustments((data as unknown as AdjustmentRow[]) ?? []);
+  };
+
   const exportCsv = () => {
     const head = ["이름", ...dates.map((d) => d.slice(8)), "결석", "지각", "환산결석"];
     const rows = members.map((m) => {
@@ -127,15 +152,9 @@ export default function Attendance() {
         t.a,
         t.l,
         t.eff,
-      ].join(",");
+      ];
     });
-    const csv = [head.join(","), ...rows].join("\n");
-    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `출석부_${month}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    downloadCsv(`출석부_${month}.csv`, [head, ...rows]);
   };
 
   return (
@@ -152,6 +171,9 @@ export default function Attendance() {
           </button>
           <button type="button" className="btn-ghost" onClick={exportCsv}>
             CSV
+          </button>
+          <button type="button" className="btn-ghost" onClick={() => void openAdjustments()}>
+            🧾 정정 이력
           </button>
         </div>
       </header>
@@ -225,6 +247,47 @@ export default function Attendance() {
           </tbody>
         </table>
       </div>
+
+      {/* 정정 이력 모달 */}
+      {adjustments !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5"
+          onClick={() => setAdjustments(null)}
+        >
+          <div
+            className="max-h-[75vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold">🧾 정정 이력 (최근 50건)</h2>
+              <button type="button" className="text-sm text-base-text/40 hover:text-base-text" onClick={() => setAdjustments(null)}>
+                ✕
+              </button>
+            </div>
+            <ul className="mt-4 space-y-2">
+              {adjustments.map((a) => (
+                <li key={a.id} className="rounded-xl bg-card-subtle px-4 py-3 text-sm">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <b>{a.attendance_records.profiles.display_name}</b>
+                    <span className="text-base-text/50">{a.attendance_records.date}</span>
+                    <span className="text-xs">
+                      {a.old_status ? STATUS_LABEL[a.old_status as keyof typeof STATUS_LABEL] : "미기록"} →{" "}
+                      <b className="text-accent-deep">{STATUS_LABEL[a.new_status as keyof typeof STATUS_LABEL]}</b>
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-base-text/60">사유: {a.reason}</div>
+                  <div className="mt-0.5 text-[11px] text-base-text/40">
+                    {a.profiles.display_name} · {a.created_at.slice(0, 16).replace("T", " ")}
+                  </div>
+                </li>
+              ))}
+              {adjustments.length === 0 && (
+                <li className="py-8 text-center text-sm text-base-text/40">정정 이력이 없습니다.</li>
+              )}
+            </ul>
+          </div>
+        </div>
+      )}
 
       {/* 기록/정정 모달 */}
       {target && (

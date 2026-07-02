@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { calcStreak } from "@kit/challenge";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
 import { monthDates, thisMonth, todayYmd, fmtWon } from "../lib/date";
@@ -86,27 +87,16 @@ export default function MyPage() {
     void load();
   };
 
-  // 이번 달 통계 + 현재 연속(스트릭)
-  const stats = useMemo(() => {
-    const done = records.filter((r) => r.status === "present" || r.status === "late").length;
-    const absent = records.filter((r) => r.status === "absent").length;
-    const late = records.filter((r) => r.status === "late").length;
-
-    const byDate = new Map(records.map((r) => [r.date, r]));
-    let streak = 0;
-    const cursor = new Date();
-    // 오늘 미제출이면 어제부터 계산
-    if (!byDate.get(today) || byDate.get(today)?.status === "absent") cursor.setDate(cursor.getDate() - 1);
-    for (;;) {
-      const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}-${String(cursor.getDate()).padStart(2, "0")}`;
-      if (key < dates[0]) break; // 이번 달 범위까지만
-      const rec = byDate.get(key);
-      if (!rec || rec.status === "absent") break;
-      streak++;
-      cursor.setDate(cursor.getDate() - 1);
-    }
-    return { done, absent, late, streak };
-  }, [records, today, dates]);
+  // 이번 달 통계 + 현재 연속(스트릭) — @kit/challenge
+  const stats = useMemo(
+    () => ({
+      done: records.filter((r) => r.status === "present" || r.status === "late").length,
+      absent: records.filter((r) => r.status === "absent").length,
+      late: records.filter((r) => r.status === "late").length,
+      streak: calcStreak(records, { today, minDate: dates[0] }),
+    }),
+    [records, today, dates],
+  );
 
   return (
     <div className="mx-auto max-w-3xl">

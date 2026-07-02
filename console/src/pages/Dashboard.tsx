@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { calcStreak, rankMembers } from "@kit/challenge";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
 import { thisMonth, todayYmd, ymd } from "../lib/date";
@@ -188,34 +189,18 @@ export default function Dashboard() {
     void load();
   };
 
-  // 이번 달 리더보드: 결석·지각 적은 순 → 연속(스트릭) 긴 순
+  // 이번 달 리더보드 — @kit/challenge의 calcStreak·rankMembers 사용
   const leaderboard = useMemo(() => {
-    const byUser = new Map<string, AttendanceRecord[]>();
-    for (const r of monthRecords) {
-      const arr = byUser.get(r.user_id) ?? [];
-      arr.push(r);
-      byUser.set(r.user_id, arr);
-    }
     const rows = members.map((m) => {
-      const mine = byUser.get(m.user_id) ?? [];
-      const byDate = new Map(mine.map((r) => [r.date, r]));
-      const absent = mine.filter((r) => r.status === "absent").length;
-      const late = mine.filter((r) => r.status === "late").length;
-      let streak = 0;
-      const cursor = new Date();
-      const todayRec = byDate.get(today);
-      if (!todayRec || todayRec.status === "absent") cursor.setDate(cursor.getDate() - 1);
-      for (;;) {
-        const key = ymd(cursor);
-        if (key < `${thisMonth()}-01`) break;
-        const rec = byDate.get(key);
-        if (!rec || rec.status === "absent") break;
-        streak++;
-        cursor.setDate(cursor.getDate() - 1);
-      }
-      return { name: m.profiles.display_name, absent, late, streak };
+      const mine = monthRecords.filter((r) => r.user_id === m.user_id);
+      return {
+        name: m.profiles.display_name,
+        absences: mine.filter((r) => r.status === "absent").length,
+        lates: mine.filter((r) => r.status === "late").length,
+        streak: calcStreak(mine, { today, minDate: `${thisMonth()}-01` }),
+      };
     });
-    return rows.sort((a, b) => a.absent + a.late - (b.absent + b.late) || b.streak - a.streak).slice(0, 5);
+    return rankMembers(rows).slice(0, 5);
   }, [members, monthRecords, today]);
 
   // 최근 7일 제출률
@@ -311,7 +296,7 @@ export default function Dashboard() {
                 <span className="text-xs text-accent-deep">🔥 {row.streak}일 연속</span>
               </span>
               <span className="text-xs text-base-text/50">
-                결석 {row.absent} · 지각 {row.late}
+                결석 {row.absences} · 지각 {row.lates}
               </span>
             </li>
           ))}

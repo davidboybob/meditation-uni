@@ -1,3 +1,6 @@
 {
+  "installCommand": "echo skip-install-local-prebuilt",
+  "buildCommand": "echo skip-build-run-npm-build-locally-before-deploy",
+  "outputDirectory": "dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
