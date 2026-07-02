@@ -25,7 +25,7 @@ export default function MyPage() {
   const [passage, setPassage] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-  const [mySettle, setMySettle] = useState<{ month: string; item: SettlementItem } | null>(null);
+  const [mySettle, setMySettle] = useState<{ month: string; status: string; item: SettlementItem } | null>(null);
   const [commentsToday, setCommentsToday] = useState(0);
 
   const dates = useMemo(() => monthDates(month), [month]);
@@ -68,7 +68,7 @@ export default function MyPage() {
         .eq("user_id", userId)
         .maybeSingle();
       if (it) {
-        setMySettle({ month: stl.month, item: it as SettlementItem });
+        setMySettle({ month: stl.month, status: stl.status, item: it as SettlementItem });
         return;
       }
     }
@@ -224,7 +224,17 @@ export default function MyPage() {
 
       {/* 내 정산 */}
       <div className="card mt-4">
-        <div className="mb-2 text-sm font-semibold">내 정산 {mySettle ? `(${mySettle.month})` : ""}</div>
+        <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+          내 정산 {mySettle ? `(${mySettle.month})` : ""}
+          {mySettle?.status === "draft" && (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+              가안 — 확정 전 수치는 바뀔 수 있어요
+            </span>
+          )}
+          {mySettle?.status === "confirmed" && (
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">확정</span>
+          )}
+        </div>
         {mySettle ? (
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
             <span>

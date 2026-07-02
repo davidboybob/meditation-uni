@@ -85,6 +85,7 @@ export default function Attendance() {
     if (!target) return;
     const { member, date, record } = target;
     if (status === "clear") {
+      // 주의: 기록 삭제 시 해당 기록의 정정 이력도 함께 삭제됨(FK cascade) — 감사가 필요하면 삭제 대신 상태 변경 권장
       if (record) {
         const { error } = await supabase.from("attendance_records").delete().eq("id", record.id);
         if (error) return toast.error(error.message);

@@ -22,7 +22,7 @@ interface FeedItem {
   comments: FeedComment[];
 }
 
-function CommentBox({ onSubmit }: { onSubmit: (text: string) => Promise<void> }) {
+function CommentBox({ onSubmit }: { onSubmit: (text: string) => Promise<boolean> }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   return (
@@ -32,9 +32,9 @@ function CommentBox({ onSubmit }: { onSubmit: (text: string) => Promise<void> })
         e.preventDefault();
         if (!text.trim()) return;
         setBusy(true);
-        void onSubmit(text.trim()).finally(() => {
+        void onSubmit(text.trim()).then((ok) => {
           setBusy(false);
-          setText("");
+          if (ok) setText(""); // 실패 시 입력 보존
         });
       }}
     >
@@ -79,7 +79,7 @@ export default function Feed() {
     void load();
   }, [load]);
 
-  const addComment = async (item: FeedItem, text: string) => {
+  const addComment = async (item: FeedItem, text: string): Promise<boolean> => {
     const { error } = await supabase.from("comments").insert({
       record_id: item.id,
       group_id: group.id,
@@ -88,10 +88,11 @@ export default function Feed() {
     });
     if (error) {
       toast.error(error.message);
-      return;
+      return false;
     }
     toast.success("답글을 남겼어요 💬");
     void load();
+    return true;
   };
 
   const removeComment = async (c: FeedComment) => {
