@@ -4,10 +4,12 @@
 
 ## 기술 스택
 
-- **프론트엔드**: React 19 + TypeScript 5.9 + Vite 7 + Tailwind CSS 3 (포트 5173)
-- **백엔드**: Python 3.9 + FastAPI + SQLAlchemy async + aiosqlite (포트 8000)
-- **DB**: SQLite (`backend/meditation.db`)
-- **구조**: 모노레포 (`frontend/` + `backend/`)
+- **홈페이지** (`frontend/`): React 19 + TypeScript 5.9 + Vite 7 + Tailwind CSS 3 (포트 5173) — 정적 소개 사이트, home.qtuniv.com
+- **운영자 콘솔** (`console/`): React 19 + TS + Vite + Tailwind + supabase-js (포트 5174) — muksang-console.vercel.app
+- **DB(콘솔)**: Supabase `muksang-univ` (ref `csqcnvckyuaknjcrwlrl`, 서울) — Postgres + Auth + RLS
+- **백엔드** (`backend/`): FastAPI + SQLite — **동결(레거시)**, 콘솔은 사용하지 않음
+- **구조**: 모노레포 (`frontend/` + `console/` + `backend/`)
+- **배포 주의**: Vercel git 자동배포 아님 — 각 디렉터리에서 `vercel --prod --yes` 수동 실행
 
 ## 개발 커맨드
 
@@ -23,13 +25,21 @@ pytest tests/test_fines.py                   # 벌금 계산 테스트
 pytest tests/test_edge_cases.py              # 엣지케이스 테스트
 ```
 
-### 프론트엔드
+### 프론트엔드 (홈페이지)
 
 ```bash
 cd frontend
 npm run dev       # 개발 서버 (포트 5173)
 npm run build     # tsc -b && vite build
 npm run lint      # ESLint 검사
+```
+
+### 운영자 콘솔
+
+```bash
+cd console
+npm run dev       # 개발 서버 (포트 5174)
+npm run build     # tsc && vite build (strict 타입체크 포함)
 ```
 
 ## 필수 사전 커밋 체크

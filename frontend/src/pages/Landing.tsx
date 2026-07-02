@@ -394,6 +394,16 @@ export default function Landing() {
                 <li><button type="button" onClick={comingSoon} className="hover:text-white">챌린지 현황</button></li>
                 <li><button type="button" onClick={comingSoon} className="hover:text-white">제출 이력</button></li>
                 <li><button type="button" onClick={comingSoon} className="hover:text-white">벌금 계산</button></li>
+                <li>
+                  <a
+                    href="https://muksang-console.vercel.app"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="text-white/50 hover:text-white"
+                  >
+                    운영자 콘솔 ↗
+                  </a>
+                </li>
               </ul>
             </div>
             <div>

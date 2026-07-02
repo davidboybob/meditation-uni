@@ -1,0 +1,7 @@
+node_modules
+dist
+.vercel
+*.local.mjs
+*.local
+.env
+.env.*

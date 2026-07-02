@@ -239,18 +239,24 @@ alter table public.memberships add constraint memberships_role_check
 
 ## 10. 로드맵
 
-### Phase A — 운영자 MVP (핵심: 출석 체크 자동화)
-- [ ] `console/` 스캐폴드 + 콘솔 셸(사이드바) + Supabase Auth(구글) + 관리자 가드
-- [ ] 스키마 확장 마이그레이션(7절) + `is_group_admin` RLS
-- [ ] 대시보드: 오늘 현황 + 퀵 체크 + 미제출 리마인드 복사
-- [ ] 출석부 월 매트릭스(기록/정정/사유 로그)
-- [ ] 멤버 관리(목록/초대코드/역할/휴면)
-- [ ] 운영자 시드 + 실데이터 1주 병행 검증(카톡 대비 오차 0 확인)
+### Phase A — 운영자 MVP (핵심: 출석 체크 자동화) — ✅ 2026-07-02 완료
+- [x] `console/` 스캐폴드 + 콘솔 셸(사이드바) + Supabase Auth(이메일, 구글 버튼*) + 관리자 가드
+- [x] 스키마 확장 마이그레이션(7절) + `is_group_admin` RLS
+- [x] 대시보드: 오늘 현황 + 퀵 체크 + 미제출 리마인드 복사
+- [x] 출석부 월 매트릭스(기록/정정/사유 로그)
+- [x] 멤버 관리(목록/초대코드/역할/휴면)
+- [x] 운영자 시드(트리거가 davidboy7780@gmail.com 자동 owner) + 테스트 데이터 검증 13/13 통과
+- [ ] 실데이터 1주 병행 검증(카톡 대비 오차 0 확인) — 운영 단계
+- *구글 OAuth는 Supabase 대시보드에서 GCP 클라이언트 등록 필요(버튼은 준비됨)
 
-### Phase B — 정산 자동화 (핵심: 월말 30분 → 1분)
-- [ ] `calculate_settlement` DB 함수 + 정산 화면(계산→검토→확정)
-- [ ] 공유용 텍스트/CSV 내보내기, 그룹 설정 화면(규칙 파라미터)
-- [ ] 통독 일정 등록 + 대시보드 "오늘 본문" 표시
+### Phase B — 정산 자동화 (핵심: 월말 30분 → 1분) — ✅ 2026-07-02 완료
+- [x] `calculate_settlement` DB 함수(SECURITY INVOKER) + 정산 화면(계산→검토→확정→해제)
+- [x] 공유용 텍스트/CSV 내보내기, 그룹 설정 화면(규칙 파라미터)
+- [x] 통독 일정 등록 + 대시보드 "오늘 본문" 표시
+
+> 배포: https://muksang-console.vercel.app (Vercel 프로젝트 `muksang-console`)
+> console.qtuniv.com 사용하려면 DNS에 CNAME `console → cname.vercel-dns.com` 추가 후 `vercel alias` 재실행.
+> 카카오톡 연동 검토: [docs/KAKAO_INTEGRATION.md](./docs/KAKAO_INTEGRATION.md)
 
 ### Phase C — 멤버 오픈 (SPEC_SAAS.md Phase 1과 합류)
 - [ ] 멤버 셀프 제출(글 링크/내용) → attendance_records 자동 생성, 운영자는 검수만
