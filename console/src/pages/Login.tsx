@@ -48,7 +48,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-[#a855f7] px-5">
-      <div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-xl">
+      <div className="w-full max-w-sm rounded-3xl bg-card p-8 shadow-xl">
         <div className="text-center leading-tight">
           <div className="text-[11px] font-medium tracking-wide text-accent-deep">1일 1묵상 · 4년 성경통독</div>
           <h1 className="mt-1 text-2xl font-bold">묵상대학 콘솔</h1>

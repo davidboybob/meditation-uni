@@ -11,6 +11,11 @@ const MENU = [
   { to: "/settings", label: "설정", icon: "⚙️", end: false, adminOnly: true },
 ];
 
+function toggleTheme() {
+  const dark = document.documentElement.classList.toggle("dark");
+  localStorage.setItem("muksang-theme", dark ? "dark" : "light");
+}
+
 export default function Shell() {
   const { loading, session, ctx, signOut } = useAuth();
   const { pathname } = useLocation();
@@ -68,7 +73,7 @@ export default function Shell() {
               end={m.end}
               className={({ isActive }) =>
                 `mb-1 flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                  isActive ? "bg-accent-deep text-white" : "hover:bg-white/10 hover:text-white"
+                  isActive ? "bg-[#8B5CF6] text-white" : "hover:bg-white/10 hover:text-white"
                 }`
               }
             >
@@ -79,11 +84,26 @@ export default function Shell() {
         </nav>
         <div className="border-t border-white/10 px-5 py-4 text-xs">
           <div className="truncate text-white/60">{session.user.email}</div>
-          <button type="button" onClick={() => void signOut()} className="mt-2 text-white/50 underline underline-offset-2 hover:text-white">
-            로그아웃
-          </button>
+          <div className="mt-2 flex items-center gap-3">
+            <button type="button" onClick={() => void signOut()} className="text-white/50 underline underline-offset-2 hover:text-white">
+              로그아웃
+            </button>
+            <button type="button" onClick={toggleTheme} className="text-white/50 hover:text-white" title="라이트/다크 전환">
+              🌓 테마
+            </button>
+          </div>
         </div>
       </aside>
+
+      {/* 모바일 테마 토글 */}
+      <button
+        type="button"
+        onClick={toggleTheme}
+        title="라이트/다크 전환"
+        className="fixed right-4 top-4 z-40 flex h-9 w-9 items-center justify-center rounded-full bg-card shadow-card md:hidden"
+      >
+        🌓
+      </button>
 
       {/* 본문 */}
       <main className="min-w-0 flex-1 px-4 pb-24 pt-6 md:ml-56 md:px-8 md:pb-10">
@@ -91,7 +111,7 @@ export default function Shell() {
       </main>
 
       {/* 하단 탭 (모바일) */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-card-border bg-white/95 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-card-border bg-card/95 backdrop-blur md:hidden">
         {menu.map((m) => (
           <NavLink
             key={m.to}

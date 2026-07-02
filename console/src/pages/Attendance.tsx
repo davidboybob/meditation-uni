@@ -206,7 +206,7 @@ export default function Attendance() {
               const t = totals(m.user_id);
               return (
                 <tr key={m.id} className="border-b border-card-border/60 hover:bg-card-subtle/60">
-                  <td className="sticky left-0 z-10 whitespace-nowrap bg-white px-3 py-1.5 font-medium">
+                  <td className="sticky left-0 z-10 whitespace-nowrap bg-card px-3 py-1.5 font-medium">
                     {m.profiles.display_name}
                   </td>
                   {dates.map((d) => {
@@ -255,7 +255,7 @@ export default function Attendance() {
           onClick={() => setAdjustments(null)}
         >
           <div
-            className="max-h-[75vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6"
+            className="max-h-[75vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-card p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
@@ -295,7 +295,7 @@ export default function Attendance() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5"
           onClick={() => setTarget(null)}
         >
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-bold">
               {target.member.profiles.display_name} · {target.date}
             </h2>

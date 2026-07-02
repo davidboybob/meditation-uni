@@ -12,7 +12,8 @@
 - [x] I4. 주간 리포트: 최근 7일 제출률·개인별 요약 카톡 복사 버튼(대시보드) ✅
 - [x] I5. 출석부 정정 이력 뷰 ✅ FK 모호성(profiles 2개 관계) 명시로 해결, 프로덕션 검증
 - [x] I9. e2e 스모크 통합: `console/scripts/smoke.mjs`(비번은 MUKSANG_TEST_PW 환경변수) ✅ 10/10
-- [ ] I6. 콘솔 테마: @kit/tokens console-dark 적용 검토(다크모드 토글)
+- [x] I6. 콘솔 다크모드: CSS 변수 팔레트(--c-*) + darkMode:class + 🌓 토글(사이드바/모바일), 시스템 선호 자동 감지 ✅ 양 모드 라이브 검증
+- [x] I+ 스키마 정본화: `docs/supabase-schema.sql` — 새 Supabase에 1회 실행으로 백엔드 전체 재현
 - [ ] I7. 홈페이지 활동사진첩(갤러리) 섹션 — 노션 원본 항목
 - [ ] I8. 초대코드 가입 플로우(join_code 입력 검증) — 다중 그룹 대비
 - [ ] I9. e2e 스모크 통합 스크립트(verify 1+2 병합, 배포 후 자동 실행)

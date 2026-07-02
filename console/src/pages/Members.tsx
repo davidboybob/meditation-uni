@@ -170,7 +170,7 @@ export default function Members() {
           onClick={() => setHistory(null)}
         >
           <div
-            className="max-h-[70vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6"
+            className="max-h-[70vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-card p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">

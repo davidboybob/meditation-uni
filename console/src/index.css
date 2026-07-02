@@ -5,6 +5,30 @@
 @tailwind utilities;
 
 @layer base {
+  /* 팔레트 — RGB 트리플렛(공백 구분), Tailwind alpha 조합용 */
+  :root {
+    --c-bg: 245 241 250;           /* 라일락 화이트 */
+    --c-text: 61 54 84;            /* 다크 플럼 */
+    --c-card: 255 255 255;
+    --c-card-subtle: 249 245 255;
+    --c-card-border: 233 226 245;
+    --c-accent: 167 139 250;       /* 라벤더 */
+    --c-accent-deep: 139 92 246;
+    --c-accent-soft: 237 231 254;
+    --c-sidebar: 28 24 48;
+  }
+  .dark {
+    --c-bg: 17 15 26;
+    --c-text: 232 228 244;
+    --c-card: 30 26 46;
+    --c-card-subtle: 39 34 58;
+    --c-card-border: 58 51 86;
+    --c-accent: 167 139 250;
+    --c-accent-deep: 186 163 255;  /* 다크에서 가독성 위해 밝게 */
+    --c-accent-soft: 49 42 76;
+    --c-sidebar: 12 10 20;
+  }
+
   body {
     @apply bg-base-bg text-base-text font-sans antialiased;
   }
@@ -17,7 +41,7 @@
   input[type="time"],
   select,
   textarea {
-    @apply rounded-xl bg-white border border-card-border px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition;
+    @apply rounded-xl bg-card border border-card-border px-3 py-2 text-sm text-base-text focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition;
   }
 }
 
@@ -26,9 +50,9 @@
     @apply rounded-xl bg-accent-deep px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-ghost {
-    @apply rounded-xl border border-card-border bg-white px-4 py-2 text-sm font-semibold text-base-text transition hover:border-accent hover:text-accent-deep disabled:opacity-40;
+    @apply rounded-xl border border-card-border bg-card px-4 py-2 text-sm font-semibold text-base-text transition hover:border-accent hover:text-accent-deep disabled:opacity-40;
   }
   .card {
-    @apply rounded-2xl bg-white p-5 shadow-card;
+    @apply rounded-2xl bg-card p-5 shadow-card;
   }
 }

@@ -1,24 +1,26 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
+        // 라이트/다크 팔레트는 src/index.css의 --c-* CSS 변수로 정의
         base: {
-          bg: "#F5F1FA",
-          text: "#3D3654",
+          bg: "rgb(var(--c-bg) / <alpha-value>)",
+          text: "rgb(var(--c-text) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#A78BFA",
-          deep: "#8B5CF6",
-          soft: "#EDE7FE",
+          DEFAULT: "rgb(var(--c-accent) / <alpha-value>)",
+          deep: "rgb(var(--c-accent-deep) / <alpha-value>)",
+          soft: "rgb(var(--c-accent-soft) / <alpha-value>)",
         },
         card: {
-          DEFAULT: "#FFFFFF",
-          subtle: "#F9F5FF",
-          border: "#E9E2F5",
+          DEFAULT: "rgb(var(--c-card) / <alpha-value>)",
+          subtle: "rgb(var(--c-card-subtle) / <alpha-value>)",
+          border: "rgb(var(--c-card-border) / <alpha-value>)",
         },
-        sidebar: "#1c1830",
+        sidebar: "rgb(var(--c-sidebar) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["Pretendard", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
