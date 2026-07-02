@@ -4,6 +4,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { AuthProvider } from "./auth/AuthContext";
 import Shell from "./components/Shell";
 import Login from "./pages/Login";
+import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Attendance from "./pages/Attendance";
 import Members from "./pages/Members";
@@ -20,6 +21,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route element={<Shell />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/attendance" element={<Attendance />} />

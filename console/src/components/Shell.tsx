@@ -18,7 +18,7 @@ function toggleTheme() {
 }
 
 export default function Shell() {
-  const { loading, session, ctx, signOut } = useAuth();
+  const { loading, session, ctx, ctxError, signOut, refreshCtx } = useAuth();
   const { pathname } = useLocation();
 
   if (loading) {
@@ -30,7 +30,21 @@ export default function Shell() {
   }
   if (!session) return <Navigate to="/login" replace />;
 
-  // 소속 그룹이 없는 계정 (비정상 상태)
+  // 조회 실패(네트워크/일시 장애) — 소속 없음과 구분해 재시도 제공
+  if (ctxError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">
+        <div className="text-4xl">📡</div>
+        <h1 className="text-lg font-bold">정보를 불러오지 못했어요</h1>
+        <p className="max-w-sm text-sm text-base-text/60">네트워크가 불안정한 것 같아요. 다시 시도해 주세요.</p>
+        <button type="button" className="btn-primary" onClick={() => void refreshCtx()}>
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
+  // 소속 그룹이 없는 계정
   if (!ctx) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-5 text-center">

@@ -9,10 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@kit/auth-supabase": "file:../../../../../00-shared-kit/packages/auth",
     "@kit/challenge": "file:../../../../../00-shared-kit/packages/challenge",
     "@kit/kakao": "file:../../../../../00-shared-kit/packages/kakao",
     "@kit/utils": "file:../../../../../00-shared-kit/packages/utils",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.110.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.14.0",

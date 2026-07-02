@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "sonner";
+import { signInWithOAuth } from "@kit/auth-supabase";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
 
@@ -39,11 +40,17 @@ export default function Login() {
   };
 
   const google = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
-    if (error) toast.error("구글 로그인 실패 — Supabase에서 Google 제공자 설정이 필요합니다.");
+    // 킷 헬퍼로 통일. redirectTo는 /auth/callback으로 고정(스킴 일관).
+    const { error } = await signInWithOAuth(supabase, "google", `${window.location.origin}/auth/callback`);
+    if (error) {
+      // 킷 wrap은 error를 문자열로 반환
+      const notEnabled = /provider is not enabled|Unsupported provider/i.test(error);
+      toast.error(
+        notEnabled
+          ? "구글 로그인이 아직 준비되지 않았어요. 운영자가 Supabase에 구글 제공자를 켜야 합니다."
+          : `구글 로그인 실패: ${error}`,
+      );
+    }
   };
 
   return (
