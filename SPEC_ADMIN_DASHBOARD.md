@@ -258,10 +258,18 @@ alter table public.memberships add constraint memberships_role_check
 > console.qtuniv.com 사용하려면 DNS에 CNAME `console → cname.vercel-dns.com` 추가 후 `vercel alias` 재실행.
 > 카카오톡 연동 검토: [docs/KAKAO_INTEGRATION.md](./docs/KAKAO_INTEGRATION.md)
 
-### Phase C — 멤버 오픈 (SPEC_SAAS.md Phase 1과 합류)
-- [ ] 멤버 셀프 제출(글 링크/내용) → attendance_records 자동 생성, 운영자는 검수만
-- [ ] 멤버용 내 현황 화면, 랜딩 CTA "준비중" 해제
-- [ ] 리마인드 자동화(알림) 검토
+### Phase C — 멤버 오픈 — ✅ 2026-07-02 완료 (알림 자동화 제외)
+- [x] 멤버 셀프 제출: `submit_meditation` RPC(KST 당일·중복 차단·late_cutoff 지각 판정) → attendance_records(source='self') 자동 생성
+- [x] 멤버용 "내 묵상" 화면(/my): 오늘 제출 폼, 이번 달 캘린더·스트릭, 내 정산(본인 라인만 RLS 허용)
+- [x] 멤버는 잠금 화면 대신 /my로 — 운영자 전용 경로는 자동 리다이렉트
+- [x] 랜딩 CTA "준비중" 해제 → 콘솔 연결
+- [ ] 리마인드 자동화(알림) 검토 — 후순위
+
+### 추가 업그레이드 (2026-07-02)
+- [x] 이월(SAVE) 자동 표시: 전월 100% 달성자는 다음 달 정산에 `carryover_in` 플래그(🔖 이월적용 — 회비 면제 표시)
+- [x] 대시보드 리더보드(결석·지각 少 → 연속 스트릭 순 Top5) + "미기록 전원 출석" 일괄 버튼
+- [x] 멤버 이름 클릭 → 최근 30일 히스토리 모달
+- [x] 카카오 공유 버튼(리마인드·정산): `VITE_KAKAO_JS_KEY` 설정 시 활성화(미설정 시 숨김) — docs/KAKAO_INTEGRATION.md 참고
 
 **성공 지표**: 일일 체크 ≤5분 · 월 정산 ≤1분+오류 0건 · 운영 기록 100% 시스템 내 보관
 

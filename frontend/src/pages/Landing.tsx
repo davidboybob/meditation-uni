@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
+
+const CONSOLE_URL = "https://muksang-console.vercel.app";
 
 /* ───────────────────────── 데이터 ───────────────────────── */
 
@@ -51,12 +52,6 @@ export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // 콘솔 앱은 별도 앱으로 준비 중 — 진입 CTA는 안내만 표시
-  const comingSoon = () =>
-    toast("콘솔 앱 준비 중입니다 🙏", {
-      description: "묵상 기록·출석·벌금 관리는 곧 오픈 예정이에요.",
-    });
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -98,14 +93,12 @@ export default function Landing() {
           </ul>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={comingSoon}
-              className="hidden items-center gap-1.5 rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-button transition hover:bg-accent-deep md:inline-flex"
+            <a
+              href={CONSOLE_URL}
+              className="hidden rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-button transition hover:bg-accent-deep md:inline-block"
             >
               묵상 시작하기
-              <span className="rounded-full bg-white/25 px-1.5 py-0.5 text-[10px] font-bold">준비중</span>
-            </button>
+            </a>
             <button
               type="button"
               aria-label="메뉴 열기"
@@ -135,16 +128,12 @@ export default function Landing() {
                 </li>
               ))}
             </ul>
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                comingSoon();
-              }}
+            <a
+              href={CONSOLE_URL}
               className="mt-2 block w-full rounded-full bg-accent px-5 py-3 text-center text-sm font-semibold text-white shadow-button"
             >
-              묵상 시작하기 <span className="ml-1 text-[10px] font-bold opacity-80">(준비중)</span>
-            </button>
+              묵상 시작하기
+            </a>
           </div>
         )}
       </header>
@@ -173,14 +162,12 @@ export default function Landing() {
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <button
-              type="button"
-              onClick={comingSoon}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-3.5 text-base font-semibold text-accent-deep shadow-lg transition hover:bg-white/90 sm:w-auto"
+            <a
+              href={CONSOLE_URL}
+              className="w-full rounded-full bg-white px-8 py-3.5 text-base font-semibold text-accent-deep shadow-lg transition hover:bg-white/90 sm:w-auto"
             >
               묵상 시작하기
-              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-bold text-accent-deep">준비중</span>
-            </button>
+            </a>
             <a
               href="#about"
               className="w-full rounded-full border border-white/40 px-8 py-3.5 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
@@ -351,14 +338,12 @@ export default function Landing() {
           <p className="mt-4 text-lg text-white/85">
             4년 후 성경 통독을 완주한 당신을 상상해 보세요. 그 첫 페이지를 지금 함께 펼칩니다.
           </p>
-          <button
-            type="button"
-            onClick={comingSoon}
-            className="mt-9 inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 text-base font-semibold text-accent-deep shadow-lg transition hover:bg-white/90"
+          <a
+            href={CONSOLE_URL}
+            className="mt-9 inline-block rounded-full bg-white px-9 py-4 text-base font-semibold text-accent-deep shadow-lg transition hover:bg-white/90"
           >
             묵상 챌린지 시작하기
-            <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-bold text-accent-deep">준비중</span>
-          </button>
+          </a>
         </div>
       </section>
 
@@ -386,21 +371,13 @@ export default function Landing() {
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-bold tracking-wide text-white">
-                콘솔 앱 <span className="ml-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold text-white/70">준비중</span>
-              </h3>
+              <h3 className="text-sm font-bold tracking-wide text-white">콘솔 앱</h3>
               <ul className="mt-4 space-y-2 text-sm">
-                <li><button type="button" onClick={comingSoon} className="hover:text-white">묵상 제출</button></li>
-                <li><button type="button" onClick={comingSoon} className="hover:text-white">챌린지 현황</button></li>
-                <li><button type="button" onClick={comingSoon} className="hover:text-white">제출 이력</button></li>
-                <li><button type="button" onClick={comingSoon} className="hover:text-white">벌금 계산</button></li>
+                <li><a href={`${CONSOLE_URL}/my`} className="hover:text-white">묵상 제출</a></li>
+                <li><a href={`${CONSOLE_URL}/my`} className="hover:text-white">내 출석 현황</a></li>
+                <li><a href={`${CONSOLE_URL}/my`} className="hover:text-white">내 정산</a></li>
                 <li>
-                  <a
-                    href="https://muksang-console.vercel.app"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="text-white/50 hover:text-white"
-                  >
+                  <a href={CONSOLE_URL} className="text-white/50 hover:text-white">
                     운영자 콘솔 ↗
                   </a>
                 </li>

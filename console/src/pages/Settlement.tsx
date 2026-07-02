@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
 import { addMonths, fmtWon, thisMonth } from "../lib/date";
+import { kakaoEnabled, shareToKakao } from "../lib/kakao";
 import type { Settlement, SettlementItem } from "../lib/types";
 
 export default function SettlementPage() {
@@ -77,9 +78,9 @@ export default function SettlementPage() {
     void load();
   };
 
-  const copyShare = async () => {
+  const shareText = () => {
     const perfect = items.filter((i) => i.scholarship);
-    const lines = [
+    return [
       `📊 묵상대학 ${month} 정산 결과`,
       `(회비 ${fmtWon(group.monthly_fee)} 기준)`,
       "",
@@ -91,11 +92,19 @@ export default function SettlementPage() {
         .filter((i) => !i.scholarship)
         .map(
           (i) =>
-            `· ${i.profiles?.display_name ?? "?"}: 결석 ${i.absences}·지각 ${i.lates} → 차감 ${fmtWon(i.deduction)} / 환급 ${fmtWon(i.refund)}`,
+            `· ${i.profiles?.display_name ?? "?"}: 결석 ${i.absences}·지각 ${i.lates} → 차감 ${fmtWon(i.deduction)} / 환급 ${fmtWon(i.refund)}${i.carryover_in ? " (전월 이월 적용)" : ""}`,
         ),
-    ];
-    await navigator.clipboard.writeText(lines.join("\n"));
+    ].join("\n");
+  };
+
+  const copyShare = async () => {
+    await navigator.clipboard.writeText(shareText());
     toast.success("공유용 정산 요약을 복사했어요.");
+  };
+
+  const kakaoShare = async () => {
+    const ok = await shareToKakao(shareText());
+    if (!ok) toast.error("카카오 SDK 로드 실패 — 키 설정을 확인하세요.");
   };
 
   const exportCsv = () => {
@@ -167,6 +176,11 @@ export default function SettlementPage() {
             <button type="button" className="btn-ghost" onClick={() => void copyShare()}>
               📋 공유 텍스트
             </button>
+            {kakaoEnabled && (
+              <button type="button" className="btn-ghost" onClick={() => void kakaoShare()}>
+                💬 카카오
+              </button>
+            )}
             <button type="button" className="btn-ghost" onClick={exportCsv}>
               CSV
             </button>
@@ -199,7 +213,11 @@ export default function SettlementPage() {
                   </td>
                   <td className="px-3 py-2.5 text-right text-rose-500">-{fmtWon(i.deduction)}</td>
                   <td className="px-3 py-2.5 text-right font-semibold">{fmtWon(i.refund)}</td>
-                  <td className="px-3 py-2.5 text-center">{i.scholarship ? "🎓 SAVE" : "—"}</td>
+                  <td className="px-3 py-2.5 text-center">
+                    {i.scholarship ? "🎓 SAVE" : ""}
+                    {i.carryover_in ? " 🔖이월적용" : ""}
+                    {!i.scholarship && !i.carryover_in ? "—" : ""}
+                  </td>
                 </tr>
               ))}
             </tbody>

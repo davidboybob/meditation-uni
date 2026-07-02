@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
-import { todayYmd, ymd } from "../lib/date";
+import { thisMonth, todayYmd, ymd } from "../lib/date";
+import { kakaoEnabled, shareToKakao } from "../lib/kakao";
 import {
   STATUS_LABEL,
   STATUS_STYLE,
@@ -10,6 +11,8 @@ import {
   type AttendanceStatus,
   type Membership,
 } from "../lib/types";
+
+const MEDALS = ["🥇", "🥈", "🥉", "4", "5"];
 
 const QUICK: AttendanceStatus[] = ["present", "late", "absent", "excused"];
 
@@ -21,13 +24,14 @@ export default function Dashboard() {
   const [members, setMembers] = useState<Membership[]>([]);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [weekRecords, setWeekRecords] = useState<AttendanceRecord[]>([]);
+  const [monthRecords, setMonthRecords] = useState<AttendanceRecord[]>([]);
   const [passage, setPassage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 6);
 
-    const [m, r, w, p] = await Promise.all([
+    const [m, r, w, mo, p] = await Promise.all([
       supabase
         .from("memberships")
         .select("*, profiles(*)")
@@ -41,11 +45,18 @@ export default function Dashboard() {
         .eq("group_id", group.id)
         .gte("date", ymd(weekStart))
         .lte("date", today),
+      supabase
+        .from("attendance_records")
+        .select("*")
+        .eq("group_id", group.id)
+        .gte("date", `${thisMonth()}-01`)
+        .lte("date", today),
       supabase.from("reading_plans").select("*").eq("group_id", group.id).eq("date", today).maybeSingle(),
     ]);
     setMembers((m.data as Membership[] | null) ?? []);
     setRecords((r.data as AttendanceRecord[] | null) ?? []);
     setWeekRecords((w.data as AttendanceRecord[] | null) ?? []);
+    setMonthRecords((mo.data as AttendanceRecord[] | null) ?? []);
     setPassage(p.data ? (p.data as { passage: string }).passage : null);
   }, [group.id, today]);
 
@@ -100,17 +111,80 @@ export default function Dashboard() {
     void load();
   };
 
-  const copyReminder = async () => {
+  const reminderText = () => {
     const names = pending.map((m) => m.profiles.display_name).join(", ");
-    const lines = [
+    return [
       `📢 묵상 리마인드 (${today.slice(5).replace("-", "/")})`,
       passage ? `오늘 본문: ${passage}` : null,
       pending.length ? `아직 제출 전: ${names}` : "오늘 전원 제출 완료! 🎉",
       "마감은 오늘 23:59입니다. 화이팅! 🙏",
-    ].filter(Boolean);
-    await navigator.clipboard.writeText(lines.join("\n"));
+    ]
+      .filter(Boolean)
+      .join("\n");
+  };
+
+  const copyReminder = async () => {
+    await navigator.clipboard.writeText(reminderText());
     toast.success("리마인드 문구를 복사했어요. 카톡방에 붙여넣기!");
   };
+
+  const kakaoReminder = async () => {
+    const ok = await shareToKakao(reminderText());
+    if (!ok) toast.error("카카오 SDK 로드 실패 — 키 설정을 확인하세요.");
+  };
+
+  // 미기록 멤버 전원 출석 처리
+  const bulkPresent = async () => {
+    const targets = members.filter((m) => !recordOf(m.user_id));
+    if (!targets.length) {
+      toast.info("오늘 미기록 멤버가 없어요.");
+      return;
+    }
+    const { error } = await supabase.from("attendance_records").upsert(
+      targets.map((m) => ({
+        group_id: group.id,
+        user_id: m.user_id,
+        date: today,
+        status: "present" as const,
+        source: "manual" as const,
+        created_by: ctx!.userId,
+      })),
+      { onConflict: "group_id,user_id,date" },
+    );
+    if (error) return toast.error(error.message);
+    toast.success(`${targets.length}명을 출석 처리했어요. (개별 수정은 셀/버튼으로)`);
+    void load();
+  };
+
+  // 이번 달 리더보드: 결석·지각 적은 순 → 연속(스트릭) 긴 순
+  const leaderboard = useMemo(() => {
+    const byUser = new Map<string, AttendanceRecord[]>();
+    for (const r of monthRecords) {
+      const arr = byUser.get(r.user_id) ?? [];
+      arr.push(r);
+      byUser.set(r.user_id, arr);
+    }
+    const rows = members.map((m) => {
+      const mine = byUser.get(m.user_id) ?? [];
+      const byDate = new Map(mine.map((r) => [r.date, r]));
+      const absent = mine.filter((r) => r.status === "absent").length;
+      const late = mine.filter((r) => r.status === "late").length;
+      let streak = 0;
+      const cursor = new Date();
+      const todayRec = byDate.get(today);
+      if (!todayRec || todayRec.status === "absent") cursor.setDate(cursor.getDate() - 1);
+      for (;;) {
+        const key = ymd(cursor);
+        if (key < `${thisMonth()}-01`) break;
+        const rec = byDate.get(key);
+        if (!rec || rec.status === "absent") break;
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      return { name: m.profiles.display_name, absent, late, streak };
+    });
+    return rows.sort((a, b) => a.absent + a.late - (b.absent + b.late) || b.streak - a.streak).slice(0, 5);
+  }, [members, monthRecords, today]);
 
   // 최근 7일 제출률
   const spark = useMemo(() => {
@@ -136,9 +210,16 @@ export default function Dashboard() {
             {today} {passage ? `· 오늘 본문: ${passage}` : ""}
           </p>
         </div>
-        <button type="button" className="btn-primary" onClick={() => void copyReminder()}>
-          📋 리마인드 문구 복사
-        </button>
+        <div className="flex gap-2">
+          {kakaoEnabled && (
+            <button type="button" className="btn-ghost" onClick={() => void kakaoReminder()}>
+              💬 카카오로 공유
+            </button>
+          )}
+          <button type="button" className="btn-primary" onClick={() => void copyReminder()}>
+            📋 리마인드 문구 복사
+          </button>
+        </div>
       </header>
 
       {/* 상단 카드 */}
@@ -183,9 +264,36 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* 리더보드 */}
+      <div className="card mt-4">
+        <div className="mb-3 text-sm font-semibold">이번 달 리더보드</div>
+        <ul className="space-y-2">
+          {leaderboard.map((row, i) => (
+            <li key={row.name} className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <span className="w-6 text-center">{MEDALS[i] ?? i + 1}</span>
+                <span className="font-medium">{row.name}</span>
+                <span className="text-xs text-accent-deep">🔥 {row.streak}일 연속</span>
+              </span>
+              <span className="text-xs text-base-text/50">
+                결석 {row.absent} · 지각 {row.late}
+              </span>
+            </li>
+          ))}
+          {leaderboard.length === 0 && (
+            <li className="py-2 text-center text-sm text-base-text/40">아직 이번 달 기록이 없어요.</li>
+          )}
+        </ul>
+      </div>
+
       {/* 퀵 체크 */}
       <div className="card mt-4">
-        <div className="mb-1 text-sm font-semibold">오늘 출석 퀵 체크</div>
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-sm font-semibold">오늘 출석 퀵 체크</span>
+          <button type="button" className="btn-ghost !px-3 !py-1.5 text-xs" onClick={() => void bulkPresent()}>
+            ✅ 미기록 전원 출석
+          </button>
+        </div>
         <p className="mb-4 text-xs text-base-text/40">카톡방 제출 글을 보며 탭 한 번으로 기록하세요.</p>
         <ul className="divide-y divide-card-border">
           {members.map((m) => {

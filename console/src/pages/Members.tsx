@@ -2,14 +2,21 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../auth/AuthContext";
-import type { Membership, Role } from "../lib/types";
+import { ymd } from "../lib/date";
+import { STATUS_LABEL, STATUS_STYLE, type AttendanceRecord, type Membership, type Role } from "../lib/types";
 
 const ROLE_LABEL: Record<Role, string> = { owner: "운영자(소유)", admin: "운영자", member: "멤버" };
+
+interface HistoryState {
+  member: Membership;
+  records: AttendanceRecord[];
+}
 
 export default function Members() {
   const { ctx } = useAuth();
   const group = ctx!.group;
   const [members, setMembers] = useState<Membership[]>([]);
+  const [history, setHistory] = useState<HistoryState | null>(null);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
@@ -41,6 +48,20 @@ export default function Members() {
     if (error) return toast.error(error.message);
     toast.success(`${m.profiles.display_name} — ${m.active ? "휴면 처리" : "활성화"}`);
     void load();
+  };
+
+  const openHistory = async (m: Membership) => {
+    const from = new Date();
+    from.setDate(from.getDate() - 29);
+    const { data, error } = await supabase
+      .from("attendance_records")
+      .select("*")
+      .eq("group_id", group.id)
+      .eq("user_id", m.user_id)
+      .gte("date", ymd(from))
+      .order("date", { ascending: false });
+    if (error) return toast.error(error.message);
+    setHistory({ member: m, records: (data as AttendanceRecord[] | null) ?? [] });
   };
 
   const copyInvite = async () => {
@@ -88,7 +109,16 @@ export default function Members() {
           <tbody>
             {members.map((m) => (
               <tr key={m.id} className={`border-b border-card-border/60 ${m.active ? "" : "opacity-45"}`}>
-                <td className="px-4 py-2.5 font-medium">{m.profiles.display_name}</td>
+                <td className="px-4 py-2.5">
+                  <button
+                    type="button"
+                    className="font-medium underline-offset-4 hover:text-accent-deep hover:underline"
+                    onClick={() => void openHistory(m)}
+                    title="최근 30일 기록 보기"
+                  >
+                    {m.profiles.display_name}
+                  </button>
+                </td>
                 <td className="px-4 py-2.5">
                   <select
                     value={m.role}
@@ -129,8 +159,45 @@ export default function Members() {
       </div>
 
       <p className="mt-3 text-xs text-base-text/40">
-        가입한 계정은 자동으로 이 그룹에 멤버로 편입됩니다. 휴면 멤버는 출석부·정산에서 제외돼요.
+        가입한 계정은 자동으로 이 그룹에 멤버로 편입됩니다. 휴면 멤버는 출석부·정산에서 제외돼요. 이름을 클릭하면
+        최근 30일 기록을 볼 수 있어요.
       </p>
+
+      {/* 최근 30일 히스토리 모달 */}
+      {history && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5"
+          onClick={() => setHistory(null)}
+        >
+          <div
+            className="max-h-[70vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold">{history.member.profiles.display_name} · 최근 30일</h2>
+              <button type="button" className="text-sm text-base-text/40 hover:text-base-text" onClick={() => setHistory(null)}>
+                ✕
+              </button>
+            </div>
+            <ul className="mt-4 space-y-1.5">
+              {history.records.map((r) => (
+                <li key={r.id} className="flex items-center justify-between rounded-lg bg-card-subtle px-3 py-2 text-sm">
+                  <span className="text-base-text/60">{r.date}</span>
+                  <span className="flex items-center gap-2">
+                    {r.source === "self" && <span className="text-[10px] text-base-text/40">셀프</span>}
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLE[r.status]}`}>
+                      {STATUS_LABEL[r.status]}
+                    </span>
+                  </span>
+                </li>
+              ))}
+              {history.records.length === 0 && (
+                <li className="py-6 text-center text-sm text-base-text/40">최근 30일 기록이 없습니다.</li>
+              )}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

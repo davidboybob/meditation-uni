@@ -64,6 +64,7 @@ export interface SettlementItem {
   refund: number;
   carryover: boolean;
   scholarship: boolean;
+  carryover_in: boolean;
   memo: string | null;
   profiles?: Profile;
 }

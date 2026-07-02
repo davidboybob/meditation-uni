@@ -25,9 +25,13 @@
 - 정산 화면 **"공유 텍스트"**: 월 정산 결과를 카톡 공지 포맷으로 복사.
 - 운영 부담: 하루 1회 붙여넣기 수준. 자동화 대비 리스크 0.
 
-### 다음 (Phase B 후보 — 공수 반나절)
-- **카카오 공유하기 버튼** 추가: [Kakao Developers](https://developers.kakao.com)에서 앱 생성 → JavaScript 키 발급 → 콘솔 도메인 등록 → `Kakao.Share.sendDefault()`로 리마인드/정산 카드를 공유. 클릭 시 카톡 대화방 선택 UI가 떠서 일반 채팅방에 바로 전송 가능(마지막 선택만 수동).
-- 콘솔에 환경변수 `VITE_KAKAO_JS_KEY`로 주입, 키 없으면 버튼 숨김 처리.
+### 다음 — ✅ 버튼 구현 완료 (2026-07-02, 키만 넣으면 활성화)
+- **카카오 공유하기 버튼**: 대시보드(리마인드)·정산(공유)에 구현돼 있으며, 키가 없으면 자동 숨김.
+- **활성화 절차**:
+  1. [Kakao Developers](https://developers.kakao.com) → 앱 생성 → 앱 키에서 **JavaScript 키** 복사
+  2. 앱 설정 → 플랫폼 → Web에 `https://muksang-console.vercel.app` 도메인 등록
+  3. Vercel `muksang-console` 프로젝트에 환경변수 `VITE_KAKAO_JS_KEY=<JS키>` 추가 후 재배포 (`vercel --prod`)
+  4. 콘솔에 "💬 카카오로 공유" 버튼이 나타남 — 클릭 시 대화방 선택 UI로 일반 채팅방에 바로 전송
 
 ### 나중 (규모 확장 시)
 - **알림톡**: 참여자가 많아지고 "개별 리마인드"가 필요해지면 도입. 요건: 사업자등록 → 카카오톡 채널 개설·비즈니스 인증 → 딜러사(예: [SOLAPI](https://solapi.com/guides/kakao-ata-guide), 알리고 등) 계약 → 템플릿 심사 → API 발송. 마감 1시간 전 미제출자에게 자동 개별 발송 같은 시나리오 구현 가능. Supabase Edge Function + pg_cron으로 트리거.
