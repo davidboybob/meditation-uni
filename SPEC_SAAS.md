@@ -1,5 +1,7 @@
 # 묵상대학 콘솔 SaaS 전환 기획서 (초안 v0.1)
 
+> 📌 후속 문서: 콘솔의 첫 제품인 **운영자 대시보드** 상세 기획은 [SPEC_ADMIN_DASHBOARD.md](./SPEC_ADMIN_DASHBOARD.md) 참고.
+
 > 작성일: 2026-07-01 · 상태: 기획 확정, Phase 1 설계
 > 결정된 방향: **B2C(개인 중심) · 소셜+이메일 인증 · 전부 무료 · MVP는 콘솔 대시보드 우선**
 > 확정 스택: **Supabase 풀 전환(Postgres + Auth + RLS)** · 우선 소셜: **구글**
