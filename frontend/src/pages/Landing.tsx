@@ -20,9 +20,9 @@ const VISION_ITEMS = [
 ];
 
 const RULES = [
-  { icon: "📖", title: "묵상대학 규칙", desc: "매일 정해진 시간까지 묵상 기록을 제출합니다. 지각·결석은 자동으로 집계되어 작은 벌금으로 책임을 더합니다." },
-  { icon: "📒", title: "1일 묵상 가이드", desc: "본문 한 장을 읽고 마음에 남는 구절, 깨달음, 적용을 짧게 기록합니다. 길이보다 꾸준함이 중요합니다." },
-  { icon: "🔖", title: "묵상 참고 사이트", desc: "추천 묵상 자료와 통독표를 따라가며 흐름을 놓치지 않고 말씀을 이어갑니다." },
+  { icon: "🔖", title: "묵상대학 규칙", desc: "월 회비와 환급·장학 시스템, 결석·지각 기준, Zoom 정기 모임까지 — 함께 완주하기 위한 약속입니다.", to: "/rules" },
+  { icon: "📒", title: "1일 묵상 가이드", desc: "말씀 1장 묵상 → 글 작성 → 공유 → 나눔. 하루 묵상이 어떻게 진행되는지 단계별로 안내합니다.", to: "/guide" },
+  { icon: "📚", title: "묵상 참고 블로그", desc: "다윗소년, 남매공작소 등 멤버들의 실제 묵상 기록을 모았습니다. 양식이 막막할 때 참고하세요.", to: "/blog" },
 ];
 
 const STAFF = [
@@ -257,11 +257,21 @@ export default function Landing() {
           </div>
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {RULES.map((r) => (
-              <div key={r.title} className="rounded-3xl border border-card-border bg-card-subtle p-8">
+              <Link
+                key={r.title}
+                to={r.to}
+                className="group flex flex-col rounded-3xl border border-card-border bg-card-subtle p-8 transition hover:-translate-y-1 hover:border-accent hover:shadow-cardHover"
+              >
                 <div className="text-3xl">{r.icon}</div>
-                <h3 className="mt-4 text-lg font-bold">{r.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-[#3D3654]/60">{r.desc}</p>
-              </div>
+                <h3 className="mt-4 text-lg font-bold group-hover:text-accent-deep">{r.title}</h3>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-[#3D3654]/60">{r.desc}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-accent-deep">
+                  자세히 보기
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="transition group-hover:translate-x-1" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -365,7 +375,16 @@ export default function Landing() {
             <div className="mt-6 font-display text-lg font-bold tracking-widest text-white">묵상 대학</div>
           </div>
 
-          <div className="mt-14 grid gap-10 border-t border-white/10 pt-12 sm:grid-cols-3">
+          <div className="mt-14 grid gap-10 border-t border-white/10 pt-12 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <h3 className="text-sm font-bold tracking-wide text-white">둘러보기</h3>
+              <ul className="mt-4 space-y-2 text-sm">
+                <li><Link to="/vision" className="hover:text-white">묵상대학 비전</Link></li>
+                <li><Link to="/rules" className="hover:text-white">묵상대학 규칙</Link></li>
+                <li><Link to="/guide" className="hover:text-white">1일 묵상 가이드</Link></li>
+                <li><Link to="/blog" className="hover:text-white">묵상 참고 블로그</Link></li>
+              </ul>
+            </div>
             <div>
               <h3 className="text-sm font-bold tracking-wide text-white">
                 콘솔 앱 <span className="ml-1 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold text-white/70">준비중</span>
