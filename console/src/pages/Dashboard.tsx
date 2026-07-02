@@ -27,10 +27,18 @@ export default function Dashboard() {
   const [weekRecords, setWeekRecords] = useState<AttendanceRecord[]>([]);
   const [monthRecords, setMonthRecords] = useState<AttendanceRecord[]>([]);
   const [passage, setPassage] = useState<string | null>(null);
+  const [commenters, setCommenters] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 6);
+
+    const { data: cm } = await supabase
+      .from("comments")
+      .select("user_id")
+      .eq("group_id", group.id)
+      .gte("created_at", `${today}T00:00:00+09:00`);
+    setCommenters(new Set(((cm as { user_id: string }[] | null) ?? []).map((c) => c.user_id)));
 
     const [m, r, w, mo, p] = await Promise.all([
       supabase
@@ -118,6 +126,7 @@ export default function Dashboard() {
       `📢 묵상 리마인드 (${today.slice(5).replace("-", "/")})`,
       passage ? `오늘 본문: ${passage}` : null,
       pending.length ? `아직 제출 전: ${names}` : "오늘 전원 제출 완료! 🎉",
+      "제출 후 나눔 피드에서 답글 1개도 잊지 마세요 💬",
       "마감은 오늘 23:59입니다. 화이팅! 🙏",
     ]
       .filter(Boolean)
@@ -304,6 +313,12 @@ export default function Dashboard() {
             <li className="py-2 text-center text-sm text-base-text/40">아직 이번 달 기록이 없어요.</li>
           )}
         </ul>
+        <div className="mt-4 border-t border-card-border pt-3 text-xs text-base-text/50">
+          💬 오늘 나눔 답글 참여 {commenters.size > 0 ? `${[...commenters].length}명` : "0명"}
+          {members.some((m) => !commenters.has(m.user_id)) && (
+            <> · 아직 안 남김: {members.filter((m) => !commenters.has(m.user_id)).map((m) => m.profiles.display_name).join(", ")}</>
+          )}
+        </div>
       </div>
 
       {/* 퀵 체크 */}

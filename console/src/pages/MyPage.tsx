@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { calcStreak } from "@kit/challenge";
 import { supabase } from "../lib/supabase";
@@ -25,10 +26,19 @@ export default function MyPage() {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [mySettle, setMySettle] = useState<{ month: string; item: SettlementItem } | null>(null);
+  const [commentsToday, setCommentsToday] = useState(0);
 
   const dates = useMemo(() => monthDates(month), [month]);
 
   const load = useCallback(async () => {
+    const { count } = await supabase
+      .from("comments")
+      .select("id", { count: "exact", head: true })
+      .eq("group_id", group.id)
+      .eq("user_id", userId)
+      .gte("created_at", `${today}T00:00:00+09:00`);
+    setCommentsToday(count ?? 0);
+
     const [r, p, s] = await Promise.all([
       supabase
         .from("attendance_records")
@@ -141,6 +151,32 @@ export default function MyPage() {
               {busy ? "제출 중…" : "오늘 묵상 제출하기 ✨"}
             </button>
           </div>
+        )}
+      </div>
+
+      {/* 오늘 목표 체크리스트 (규칙 2. 1일 목표) */}
+      <div className="card mt-4">
+        <div className="text-sm font-semibold">오늘 목표</div>
+        <ul className="mt-3 space-y-2 text-sm">
+          <li className="flex items-center gap-2">
+            <span className={todayRecord ? "" : "opacity-30"}>{todayRecord ? "✅" : "⬜"}</span>
+            묵상 글 제출하기
+            {todayRecord && <span className="text-xs text-base-text/40">완료</span>}
+          </li>
+          <li className="flex items-center gap-2">
+            <span className={commentsToday > 0 ? "" : "opacity-30"}>{commentsToday > 0 ? "✅" : "⬜"}</span>
+            다른 사람 글에 답글 1회 이상
+            {commentsToday > 0 ? (
+              <span className="text-xs text-base-text/40">오늘 {commentsToday}개</span>
+            ) : (
+              <Link to="/feed" className="text-xs font-semibold text-accent-deep underline underline-offset-2">
+                나눔 피드 가기 →
+              </Link>
+            )}
+          </li>
+        </ul>
+        {todayRecord && commentsToday > 0 && (
+          <p className="mt-3 text-xs font-semibold text-emerald-600">오늘 목표 모두 달성! 🎉</p>
         )}
       </div>
 
