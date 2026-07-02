@@ -15,6 +15,7 @@ interface HistoryState {
 export default function Members() {
   const { ctx } = useAuth();
   const group = ctx!.group;
+  const iAmOwner = ctx!.role === "owner";
   const [members, setMembers] = useState<Membership[]>([]);
   const [history, setHistory] = useState<HistoryState | null>(null);
 
@@ -124,8 +125,10 @@ export default function Members() {
                     value={m.role}
                     onChange={(e) => void setRole(m, e.target.value as Role)}
                     className="!px-2 !py-1 text-xs"
+                    disabled={m.role === "owner" && !iAmOwner}
+                    title={m.role === "owner" && !iAmOwner ? "owner 역할은 owner만 변경할 수 있어요" : undefined}
                   >
-                    <option value="owner">운영자(소유)</option>
+                    {(iAmOwner || m.role === "owner") && <option value="owner">운영자(소유)</option>}
                     <option value="admin">운영자</option>
                     <option value="member">멤버</option>
                   </select>

@@ -34,6 +34,7 @@ const ALL_STATUS: AttendanceStatus[] = ["present", "late", "absent", "excused"];
 export default function Attendance() {
   const { ctx } = useAuth();
   const group = ctx!.group;
+  const readOnly = !(ctx!.role === "owner" || ctx!.role === "admin"); // 멤버는 보기 전용
   const today = todayYmd();
 
   const [month, setMonth] = useState(thisMonth());
@@ -173,13 +174,17 @@ export default function Attendance() {
           <button type="button" className="btn-ghost" onClick={exportCsv}>
             CSV
           </button>
-          <button type="button" className="btn-ghost" onClick={() => void openAdjustments()}>
-            🧾 정정 이력
-          </button>
+          {!readOnly && (
+            <button type="button" className="btn-ghost" onClick={() => void openAdjustments()}>
+              🧾 정정 이력
+            </button>
+          )}
         </div>
       </header>
       <p className="mt-1 text-xs text-base-text/40">
-        셀을 클릭해 기록/정정하세요. 지각 {group.late_per_absence}회 = 결석 1회로 환산됩니다.
+        {readOnly
+          ? `보기 전용 — 함께 달리는 중! 지각 ${group.late_per_absence}회 = 결석 1회로 환산됩니다.`
+          : `셀을 클릭해 기록/정정하세요. 지각 ${group.late_per_absence}회 = 결석 1회로 환산됩니다.`}
       </p>
 
       <div className="card mt-4 overflow-x-auto p-0">
@@ -212,21 +217,31 @@ export default function Attendance() {
                   </td>
                   {dates.map((d) => {
                     const r = recMap.get(`${m.user_id}|${d}`);
+                    const title = `${m.profiles.display_name} · ${d}${r ? ` · ${STATUS_LABEL[r.status]}` : ""}`;
                     return (
                       <td key={d} className="p-0 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setTarget({ member: m, date: d, record: r });
-                            setReason("");
-                          }}
-                          className={`h-8 w-full min-w-8 text-[13px] leading-8 transition hover:bg-accent-soft ${
-                            d === today ? "bg-accent-soft/40" : ""
-                          }`}
-                          title={`${m.profiles.display_name} · ${d}${r ? ` · ${STATUS_LABEL[r.status]}` : ""}`}
-                        >
-                          {r ? STATUS_DOT[r.status] : "·"}
-                        </button>
+                        {readOnly ? (
+                          <div
+                            className={`h-8 w-full min-w-8 text-[13px] leading-8 ${d === today ? "bg-accent-soft/40" : ""}`}
+                            title={title}
+                          >
+                            {r ? STATUS_DOT[r.status] : "·"}
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTarget({ member: m, date: d, record: r });
+                              setReason("");
+                            }}
+                            className={`h-8 w-full min-w-8 text-[13px] leading-8 transition hover:bg-accent-soft ${
+                              d === today ? "bg-accent-soft/40" : ""
+                            }`}
+                            title={title}
+                          >
+                            {r ? STATUS_DOT[r.status] : "·"}
+                          </button>
+                        )}
                       </td>
                     );
                   })}

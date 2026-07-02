@@ -145,6 +145,14 @@ $$;
 revoke execute on function private.is_group_admin(uuid) from public;
 grant execute on function private.is_group_admin(uuid) to authenticated;
 
+create or replace function private.is_group_owner(gid uuid)
+returns boolean language sql security definer set search_path = '' stable as $$
+  select exists (select 1 from public.memberships
+                 where group_id = gid and user_id = auth.uid() and role = 'owner');
+$$;
+revoke execute on function private.is_group_owner(uuid) from public;
+grant execute on function private.is_group_owner(uuid) to authenticated;
+
 -- 4) RLS 정책 ---------------------------------------------------
 drop policy if exists "profiles_select"     on public.profiles;
 drop policy if exists "profiles_update_own" on public.profiles;
@@ -164,8 +172,42 @@ drop policy if exists "memberships_select"       on public.memberships;
 drop policy if exists "memberships_update_admin" on public.memberships;
 create policy "memberships_select" on public.memberships for select to authenticated
   using (private.user_in_group(group_id));
+-- owner 보호: admin은 owner 행 접근/owner 승격 불가 (owner만 가능)
 create policy "memberships_update_admin" on public.memberships for update to authenticated
-  using (private.is_group_admin(group_id)) with check (private.is_group_admin(group_id));
+  using (private.is_group_admin(group_id)
+         and (private.is_group_owner(group_id) or role <> 'owner'))
+  with check (private.is_group_admin(group_id)
+              and (private.is_group_owner(group_id) or role <> 'owner'));
+
+-- 마지막 owner 강등/삭제 방지
+create or replace function private.protect_last_owner()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare
+  v_owner_cnt int;
+begin
+  if tg_op = 'UPDATE' and old.role = 'owner' and new.role <> 'owner' then
+    select count(*) into v_owner_cnt from public.memberships
+    where group_id = old.group_id and role = 'owner';
+    if v_owner_cnt <= 1 then
+      raise exception '마지막 운영자(소유)는 강등할 수 없습니다. 먼저 다른 owner를 지정하세요.';
+    end if;
+  elsif tg_op = 'DELETE' and old.role = 'owner' then
+    select count(*) into v_owner_cnt from public.memberships
+    where group_id = old.group_id and role = 'owner';
+    if v_owner_cnt <= 1 then
+      raise exception '마지막 운영자(소유)는 삭제할 수 없습니다.';
+    end if;
+  end if;
+  if tg_op = 'DELETE' then return old; end if;
+  return new;
+end;
+$$;
+revoke execute on function private.protect_last_owner() from public;
+
+drop trigger if exists trg_protect_last_owner on public.memberships;
+create trigger trg_protect_last_owner
+  before update or delete on public.memberships
+  for each row execute function private.protect_last_owner();
 
 drop policy if exists "att_select"      on public.attendance_records;
 drop policy if exists "att_insert"      on public.attendance_records;

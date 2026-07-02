@@ -3,7 +3,7 @@ import { useAuth } from "../auth/AuthContext";
 
 const MENU = [
   { to: "/", label: "대시보드", icon: "🏠", end: true, adminOnly: true },
-  { to: "/attendance", label: "출석부", icon: "📅", end: false, adminOnly: true },
+  { to: "/attendance", label: "출석부", icon: "📅", end: false, adminOnly: false },
   { to: "/members", label: "멤버", icon: "👥", end: false, adminOnly: true },
   { to: "/settlement", label: "정산", icon: "💰", end: false, adminOnly: true },
   { to: "/plan", label: "통독 일정", icon: "📖", end: false, adminOnly: true },
