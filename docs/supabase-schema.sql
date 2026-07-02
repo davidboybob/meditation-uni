@@ -366,7 +366,34 @@ revoke execute on function public.submit_meditation(uuid, text) from public;
 revoke execute on function public.submit_meditation(uuid, text) from anon;
 grant execute on function public.submit_meditation(uuid, text) to authenticated;
 
--- 8) 기본 그룹 시드 (이름·규칙은 서비스에 맞게 수정) --------------
+-- 8) 나눔 피드 답글 ---------------------------------------------
+create table if not exists public.comments (
+  id         uuid primary key default gen_random_uuid(),
+  record_id  uuid not null references public.attendance_records(id) on delete cascade,
+  group_id   uuid not null references public.groups(id) on delete cascade,
+  user_id    uuid not null references public.profiles(id) on delete cascade,
+  content    text not null check (length(trim(content)) > 0),
+  created_at timestamptz not null default now()
+);
+alter table public.comments enable row level security;
+grant select, insert, delete on public.comments to authenticated;
+
+drop policy if exists "cmt_select" on public.comments;
+drop policy if exists "cmt_insert" on public.comments;
+drop policy if exists "cmt_delete" on public.comments;
+create policy "cmt_select" on public.comments for select to authenticated
+  using (private.user_in_group(group_id));
+create policy "cmt_insert" on public.comments for insert to authenticated
+  with check (
+    user_id = (select auth.uid())
+    and private.user_in_group(group_id)
+    and exists (select 1 from public.attendance_records r
+                where r.id = record_id and r.group_id = comments.group_id)
+  );
+create policy "cmt_delete" on public.comments for delete to authenticated
+  using (user_id = (select auth.uid()) or private.is_group_admin(group_id));
+
+-- 9) 기본 그룹 시드 (이름·규칙은 서비스에 맞게 수정) --------------
 insert into public.groups (name, join_code, deadline_default)
 values ('묵상대학 기본 그룹', 'DEFAULT', '06:00')
 on conflict (join_code) do nothing;

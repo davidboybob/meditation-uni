@@ -10,6 +10,7 @@ import SettlementPage from "./pages/Settlement";
 import Plan from "./pages/Plan";
 import Settings from "./pages/Settings";
 import MyPage from "./pages/MyPage";
+import Feed from "./pages/Feed";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/settlement" element={<SettlementPage />} />
             <Route path="/plan" element={<Plan />} />
             <Route path="/my" element={<MyPage />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
