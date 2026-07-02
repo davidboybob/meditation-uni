@@ -12,6 +12,8 @@ const NAV_LINKS = [
   { href: "#contact", label: "문의" },
 ];
 
+const VISION_URL = "https://davidboy7780.notion.site/52b63252b94f4bf19d5b30a877002ad1";
+
 const VISION_ITEMS = [
   { num: "1일", label: "하루 한 장 묵상", desc: "매일 한 장씩, 작은 습관이 4년의 여정을 만듭니다." },
   { num: "4년", label: "성경 통독 완주", desc: "1일 1묵상으로 4년 동안 성경 전체를 통독합니다." },
@@ -222,7 +224,20 @@ export default function Landing() {
         <div className="mx-auto max-w-5xl">
           <div className="text-center">
             <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Vision</span>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">묵상 대학 비전</h2>
+            <a
+              href={VISION_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="group mt-3 inline-flex items-center justify-center gap-2"
+            >
+              <h2 className="font-display text-3xl font-bold underline-offset-8 transition group-hover:text-accent-deep group-hover:underline sm:text-4xl">
+                묵상 대학 비전
+              </h2>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
+              </svg>
+            </a>
+            <p className="mt-3 text-sm text-[#3D3654]/50">클릭하면 비전 전문(노션)을 볼 수 있어요</p>
           </div>
           <div className="mt-14 grid gap-6 sm:grid-cols-3">
             {VISION_ITEMS.map((v) => (
