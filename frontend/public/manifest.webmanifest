@@ -1,0 +1,14 @@
+{
+  "name": "묵상대학 — 1일 1묵상 · 4년 성경통독",
+  "short_name": "묵상대학",
+  "description": "1일 1묵상으로 4년 동안 성경을 통독하는 모임, 묵상대학입니다.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4f46e5",
+  "theme_color": "#7c3aed",
+  "lang": "ko",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
