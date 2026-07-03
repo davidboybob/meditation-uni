@@ -44,6 +44,14 @@ export default function Members() {
     void load();
   };
 
+  const saveKakaoName = async (m: Membership, kakao_name: string) => {
+    const value = kakao_name.trim() || null;
+    const { error } = await supabase.from("memberships").update({ kakao_name: value }).eq("id", m.id);
+    if (error) return toast.error(error.message);
+    toast.success(`${m.profiles.display_name}의 카톡 이름 저장`);
+    void load();
+  };
+
   const toggleActive = async (m: Membership) => {
     const { error } = await supabase.from("memberships").update({ active: !m.active }).eq("id", m.id);
     if (error) return toast.error(error.message);
@@ -102,6 +110,7 @@ export default function Members() {
             <tr className="border-b border-card-border bg-card-subtle text-left text-xs text-base-text/50">
               <th className="px-4 py-2.5 font-semibold">이름</th>
               <th className="px-4 py-2.5 font-semibold">역할</th>
+              <th className="px-4 py-2.5 font-semibold">카톡 이름</th>
               <th className="px-4 py-2.5 font-semibold">상태</th>
               <th className="px-4 py-2.5 font-semibold">가입일</th>
               <th className="px-4 py-2.5" />
@@ -134,6 +143,17 @@ export default function Members() {
                   </select>
                 </td>
                 <td className="px-4 py-2.5">
+                  <input
+                    type="text"
+                    defaultValue={m.kakao_name ?? ""}
+                    placeholder="카톡 표시명"
+                    className="!w-28 !px-2 !py-1 text-xs"
+                    onBlur={(e) => {
+                      if ((e.target.value.trim() || null) !== (m.kakao_name ?? null)) void saveKakaoName(m, e.target.value);
+                    }}
+                  />
+                </td>
+                <td className="px-4 py-2.5">
                   <span
                     className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                       m.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-500"
@@ -152,7 +172,7 @@ export default function Members() {
             ))}
             {members.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-base-text/40">
+                <td colSpan={6} className="py-8 text-center text-base-text/40">
                   멤버가 없습니다. 초대 안내를 공유해 보세요.
                 </td>
               </tr>

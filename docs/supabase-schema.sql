@@ -39,6 +39,7 @@ create table if not exists public.memberships (
   group_id  uuid not null references public.groups(id) on delete cascade,
   role      text not null default 'member' check (role in ('owner','admin','member')),
   active    boolean not null default true,
+  kakao_name text,
   joined_at timestamptz not null default now(),
   unique (user_id, group_id)
 );
@@ -49,7 +50,7 @@ create table if not exists public.attendance_records (
   user_id    uuid not null references public.profiles(id) on delete cascade,
   date       date not null,
   status     text not null check (status in ('present','late','absent','excused')),
-  source     text not null default 'manual' check (source in ('manual','self')),
+  source     text not null default 'manual' check (source in ('manual','self','kakao')),
   note       text,
   created_by uuid references public.profiles(id),
   created_at timestamptz not null default now(),

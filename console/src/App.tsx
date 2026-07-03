@@ -10,6 +10,7 @@ import Attendance from "./pages/Attendance";
 import Members from "./pages/Members";
 import SettlementPage from "./pages/Settlement";
 import Plan from "./pages/Plan";
+import Import from "./pages/Import";
 import Settings from "./pages/Settings";
 import MyPage from "./pages/MyPage";
 import Feed from "./pages/Feed";
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/members" element={<Members />} />
             <Route path="/settlement" element={<SettlementPage />} />
             <Route path="/plan" element={<Plan />} />
+            <Route path="/import" element={<Import />} />
             <Route path="/my" element={<MyPage />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/settings" element={<Settings />} />

@@ -78,11 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // onAuthChange 콜백은 동기로 유지 — 콜백 안에서 supabase 쿼리를 await하면
     // auth-js initializePromise 순환 대기로 무한 로딩(데드락) 발생. loadCtx는 밖으로 미룬다.
     // 킷 onAuthChange는 (session)만 넘기고 unsubscribe 함수를 반환한다.
+    // 주의: 여기서 setLoading(true)를 하면 토큰 갱신(약 1시간)마다 전역 로딩 화면이 떠
+    //       화면 전체가 잠깐 언마운트되고 작업 중이던 입력이 날아간다. 전역 로딩은 초기 1회만.
     const unsubscribe = onAuthChange(supabase, (s: Session | null) => {
       setSession(s);
-      setLoading(true);
       setTimeout(() => {
-        if (active) void loadCtx(s).finally(() => active && setLoading(false));
+        if (active) void loadCtx(s);
       }, 0);
     });
     return () => {

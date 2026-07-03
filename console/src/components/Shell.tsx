@@ -7,6 +7,7 @@ const MENU = [
   { to: "/members", label: "멤버", icon: "👥", end: false, adminOnly: true },
   { to: "/settlement", label: "정산", icon: "💰", end: false, adminOnly: true },
   { to: "/plan", label: "통독 일정", icon: "📖", end: false, adminOnly: true },
+  { to: "/import", label: "카톡 출석", icon: "💬", end: false, adminOnly: true },
   { to: "/my", label: "내 묵상", icon: "🌱", end: false, adminOnly: false },
   { to: "/feed", label: "나눔 피드", icon: "💬", end: false, adminOnly: false },
   { to: "/settings", label: "설정", icon: "⚙️", end: false, adminOnly: true },

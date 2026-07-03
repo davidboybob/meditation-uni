@@ -24,6 +24,7 @@ export interface Membership {
   group_id: string;
   role: Role;
   active: boolean;
+  kakao_name: string | null;
   joined_at: string;
   profiles: Profile;
 }
@@ -34,7 +35,7 @@ export interface AttendanceRecord {
   user_id: string;
   date: string; // YYYY-MM-DD
   status: AttendanceStatus;
-  source: "manual" | "self";
+  source: "manual" | "self" | "kakao";
   note: string | null;
 }
 
