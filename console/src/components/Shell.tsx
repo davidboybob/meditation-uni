@@ -65,7 +65,7 @@ export default function Shell() {
   const menu = MENU.filter((m) => isAdmin || !m.adminOnly);
 
   // 멤버가 운영자 전용 경로 접근 시 내 묵상으로
-  const target = MENU.find((m) => (m.end ? pathname === m.to : pathname.startsWith(m.to) && m.to !== "/"));
+  const target = MENU.find((m) => (m.end ? pathname === m.to : (pathname === m.to || pathname.startsWith(m.to + "/")) && m.to !== "/"));
   const isAdminPath = pathname === "/" || (target?.adminOnly ?? false);
   if (!isAdmin && isAdminPath && pathname !== "/my") {
     return <Navigate to="/my" replace />;

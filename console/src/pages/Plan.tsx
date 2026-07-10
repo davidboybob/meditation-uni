@@ -142,7 +142,7 @@ export default function Plan() {
           </label>
           <label className="flex flex-col gap-1 text-xs font-medium">
             시작 날짜
-            <input type="text" placeholder="2026-07-03" value={genFrom} onChange={(e) => setGenFrom(e.target.value)} />
+            <input type="date" value={genFrom} onChange={(e) => setGenFrom(e.target.value)} />
           </label>
           <label className="flex items-end gap-2 pb-2 text-xs font-medium">
             <input
