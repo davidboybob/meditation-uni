@@ -1,4 +1,5 @@
 from __future__ import annotations
+import logging
 import os
 from datetime import date, timedelta
 from typing import List
@@ -16,6 +17,12 @@ from app.api.challenges import _challenge_response
 router = APIRouter(prefix="/admin")
 
 ADMIN_PIN = os.environ.get("ADMIN_PIN", "1234")
+
+if ADMIN_PIN == "1234":
+    logging.warning(
+        "[보안 경고] ADMIN_PIN이 기본값(1234)입니다. "
+        "프로덕션 환경에서는 환경변수 ADMIN_PIN을 반드시 변경하세요."
+    )
 
 
 class PinRequest(BaseModel):
