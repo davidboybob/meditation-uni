@@ -38,12 +38,13 @@ export default function Plan() {
   const [skipSunday, setSkipSunday] = useState(false);
 
   const load = useCallback(async () => {
+    const nextMonthFirst = addMonths(month, 1) + "-01";
     const { data } = await supabase
       .from("reading_plans")
       .select("*")
       .eq("group_id", group.id)
       .gte("date", `${month}-01`)
-      .lte("date", `${month}-31`)
+      .lt("date", nextMonthFirst)
       .order("date");
     setPlans((data as ReadingPlan[] | null) ?? []);
   }, [group.id, month]);

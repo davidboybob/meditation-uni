@@ -17,19 +17,27 @@ export default function SettlementPage() {
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("settlements")
       .select("*")
       .eq("group_id", group.id)
       .eq("month", month)
       .maybeSingle();
+    if (error) {
+      toast.error(`정산 조회 실패: ${error.message}`);
+      return;
+    }
     setStl((data as Settlement | null) ?? null);
     if (data) {
-      const { data: it } = await supabase
+      const { data: it, error: itError } = await supabase
         .from("settlement_items")
         .select("*, profiles(*)")
         .eq("settlement_id", (data as Settlement).id)
         .order("refund", { ascending: false });
+      if (itError) {
+        toast.error(`정산 항목 조회 실패: ${itError.message}`);
+        return;
+      }
       setItems((it as SettlementItem[] | null) ?? []);
     } else {
       setItems([]);
